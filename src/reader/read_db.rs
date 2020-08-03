@@ -1,4 +1,4 @@
-use super::super::dto::value_with_description::ValueWithDescription;
+use super::value_with_description::ValueWithDescription;
 use std::collections::HashMap;
 
 pub trait ReadDb {

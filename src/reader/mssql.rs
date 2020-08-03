@@ -1,4 +1,4 @@
-use super::super::abstraction::read_db::ReadDb;
+use super::read_db::ReadDb;
 pub struct MSSQL();
 
 impl ReadDb for MSSQL {
@@ -11,7 +11,7 @@ impl ReadDb for MSSQL {
     fn get_records_with_meta_description_column(
         &self,
         table_name: String,
-    ) -> std::collections::HashMap<String, crate::dto::value_with_description::ValueWithDescription>
+    ) -> std::collections::HashMap<String, super::value_with_description::ValueWithDescription>
     {
         todo!()
     }
