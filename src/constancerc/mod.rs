@@ -1,16 +1,17 @@
 pub mod manager;
+pub mod output_options;
+pub mod query_execution_options;
 pub mod table_identifier;
 pub mod table_option;
 
 use table_option::TableOption;
 
 pub mod language;
-use language::Language;
+use output_options::OutputOptions;
+use query_execution_options::QueryExecutionOptions;
 #[derive(Debug)]
 pub struct ConstanceRc {
     pub table_options: Vec<TableOption>,
-    pub language_targets: Vec<Language>,
-    pub conn_string: String,
-    pub query_timeout_in_ms: i32,
-    pub should_parallelize: bool,
+    pub output_options: OutputOptions,
+    pub query_execution_options: QueryExecutionOptions,
 }

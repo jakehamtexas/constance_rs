@@ -4,3 +4,9 @@ pub enum Language {
     Rust,
     Dotnet,
 }
+
+impl Default for Language {
+    fn default() -> Self {
+        Language::Dotnet
+    }
+}
