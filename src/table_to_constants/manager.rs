@@ -1,4 +1,4 @@
-use super::super::constancerc::table_option::TableOption;
+use super::super::constancerc::dto::table_option::TableOption;
 use super::super::reader::read_db::ReadDb;
 use super::table_constant::TableConstant;
 

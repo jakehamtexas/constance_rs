@@ -3,7 +3,7 @@ mod reader;
 mod table_to_constants;
 mod write_files_for_targets;
 fn main() {
-    let rc = constancerc::manager::get_runtime_configuration();
+    let rc = constancerc::get_runtime_configuration::manager::get_runtime_configuration();
 
     let table_options = &rc.table_options;
     let output_options = &rc.output_options;
