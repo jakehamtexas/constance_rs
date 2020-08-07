@@ -1,7 +1,8 @@
-#[derive(Debug)]
-pub struct TableIdentifier<'a> {
-    instance_name: &'a str,
-    database_name: &'a str,
-    schema_name: &'a str,
-    object_name: &'a str,
+use serde::Deserialize;
+#[derive(Debug, Deserialize)]
+pub struct TableIdentifier {
+    pub instance_name: String,
+    pub database_name: String,
+    pub schema_name: String,
+    pub object_name: String,
 }

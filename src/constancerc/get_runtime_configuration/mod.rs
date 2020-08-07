@@ -14,9 +14,10 @@ pub fn get_runtime_configuration<'a>(
     let buf = file_system
         .get_file(path)
         .expect(&format!("No configuration file found at path: {}", path));
-    match file_system.get_extension(path) {
+    let result = match file_system.get_extension(path) {
         RcFileExtension::Json => rc_parser.from_json(&buf),
         RcFileExtension::Yaml => rc_parser.from_yaml(&buf),
         _ => panic!("Unrecognized file type!"),
-    }
+    };
+    result.expect(&format!("Unable to parse {}", path))
 }

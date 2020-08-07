@@ -1,22 +1,23 @@
-#[derive(Debug)]
-pub struct QueryExecutionOptions<'a> {
-    pub conn_string: &'a str,
+use serde::Deserialize;
+#[derive(Debug, Deserialize)]
+pub struct QueryExecutionOptions {
+    pub conn_string: String,
     pub query_timeout_in_ms: Option<i32>,
     pub should_parallelize: Option<bool>,
 }
 
-impl Default for QueryExecutionOptions<'_> {
+impl Default for QueryExecutionOptions {
     fn default() -> Self {
         Self {
-            conn_string: "",
+            conn_string: String::from(""),
             query_timeout_in_ms: Some(1000),
             should_parallelize: Some(false),
         }
     }
 }
 
-impl QueryExecutionOptions<'_> {
-    pub fn default_with_conn_string(conn_string: &str) -> QueryExecutionOptions {
+impl QueryExecutionOptions {
+    pub fn default_with_conn_string(conn_string: String) -> QueryExecutionOptions {
         QueryExecutionOptions {
             conn_string,
             ..Default::default()

@@ -1,4 +1,5 @@
-#[derive(Debug)]
+use serde::Deserialize;
+#[derive(Debug, Deserialize)]
 pub enum Language {
     Typescript,
     Rust,
