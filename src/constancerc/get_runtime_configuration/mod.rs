@@ -1,21 +1,22 @@
 use super::dto::ConstanceRc;
-use file_system::{FileSystem, RcFileExtension};
-use rc_parser::RcParser;
+use i_file_system::{IFileSystem, RcFileExtension};
+use i_rc_parser::IRcParser;
 
-pub mod file_system;
-pub mod rc_parser;
+pub mod concrete;
+pub mod i_file_system;
+pub mod i_rc_parser;
 
-pub fn get_runtime_configuration(
-    path: String,
-    file_system: impl FileSystem,
-    rc_parser: impl RcParser,
+pub fn get_runtime_configuration<'a>(
+    path: &'a str,
+    file_system: impl IFileSystem,
+    rc_parser: impl IRcParser,
 ) -> ConstanceRc {
     let buf = file_system
         .get_file(path)
         .expect(&format!("No configuration file found at path: {}", path));
     match file_system.get_extension(path) {
-        RcFileExtension::Json => rc_parser.from_json(buf),
-        RcFileExtension::Yaml => rc_parser.from_yaml(buf),
+        RcFileExtension::Json => rc_parser.from_json(&buf),
+        RcFileExtension::Yaml => rc_parser.from_yaml(&buf),
         _ => panic!("Unrecognized file type!"),
     }
 }
