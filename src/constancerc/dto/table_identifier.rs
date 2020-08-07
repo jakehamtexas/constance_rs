@@ -1,7 +1,7 @@
 #[derive(Debug)]
-pub struct TableIdentifier {
-    instance_name: String,
-    database_name: String,
-    schema_name: String,
-    object_name: String,
+pub struct TableIdentifier<'a> {
+    instance_name: &'a str,
+    database_name: &'a str,
+    schema_name: &'a str,
+    object_name: &'a str,
 }

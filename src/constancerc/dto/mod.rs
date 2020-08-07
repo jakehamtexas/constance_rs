@@ -9,8 +9,8 @@ pub mod language;
 use output_options::OutputOptions;
 use query_execution_options::QueryExecutionOptions;
 #[derive(Debug)]
-pub struct ConstanceRc {
-    pub table_options: Vec<TableOption>,
-    pub output_options: OutputOptions,
-    pub query_execution_options: QueryExecutionOptions,
+pub struct ConstanceRc<'a> {
+    pub table_options: Vec<TableOption<'a>>,
+    pub output_options: OutputOptions<'a>,
+    pub query_execution_options: QueryExecutionOptions<'a>,
 }
