@@ -5,6 +5,7 @@ pub trait IFileSystem {
     fn get_extension(&self, path: &str) -> RcFileExtension;
 }
 
+#[derive(PartialEq, Debug)]
 pub enum RcFileExtension {
     Json,
     Yaml,
