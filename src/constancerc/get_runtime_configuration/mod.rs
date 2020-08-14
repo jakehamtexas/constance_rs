@@ -7,6 +7,7 @@ use abstraction::{
 
 pub mod abstraction;
 pub mod concrete;
+pub mod test;
 
 pub fn get_runtime_configuration<'a>(
     cli_args: impl ICliArgs,
