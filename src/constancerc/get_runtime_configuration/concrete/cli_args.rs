@@ -4,10 +4,7 @@ use std::env;
 pub struct CliArgs {}
 
 impl ICliArgs for CliArgs {
-    fn get_path(&self) -> String {
-        let args = env::args().collect::<Vec<String>>();
-        args.first()
-            .expect("No configuration path specified!")
-            .to_owned()
+    fn _get_args(&self) -> Vec<String> {
+        env::args().collect::<Vec<String>>()
     }
 }
