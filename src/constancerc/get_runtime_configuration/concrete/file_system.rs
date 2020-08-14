@@ -17,8 +17,8 @@ impl IFileSystem for FileSystem {
         Ok(contents)
     }
     fn get_extension(&self, path: &str) -> RcFileExtension {
-        let extension =
-            get_extension_raw(path).expect(&format!("There isn't a file at this path: {}", path));
+        let extension = get_extension_raw(path)
+            .expect(&format!("This file doesn't have an extension: {}", path));
         match extension {
             "json" => RcFileExtension::Json,
             "yml" => RcFileExtension::Yaml,
