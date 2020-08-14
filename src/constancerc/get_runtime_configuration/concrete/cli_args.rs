@@ -1,4 +1,4 @@
-use crate::constancerc::get_runtime_configuration::i_cli_args::ICliArgs;
+use super::super::abstraction::i_cli_args::ICliArgs;
 use std::env;
 
 pub struct CliArgs {}

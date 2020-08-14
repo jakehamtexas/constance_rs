@@ -1,5 +1,4 @@
-use super::super::i_file_system::IFileSystem;
-use crate::constancerc::get_runtime_configuration::i_file_system::RcFileExtension;
+use super::super::abstraction::i_file_system::{IFileSystem, RcFileExtension};
 use std::ffi::OsStr;
 use std::fs::File;
 use std::io::{prelude::*, Error};
@@ -17,10 +16,7 @@ impl IFileSystem for FileSystem {
         file.read_to_string(&mut contents)?;
         Ok(contents)
     }
-    fn get_extension(
-        &self,
-        path: &str,
-    ) -> crate::constancerc::get_runtime_configuration::i_file_system::RcFileExtension {
+    fn get_extension(&self, path: &str) -> RcFileExtension {
         let extension =
             get_extension_raw(path).expect(&format!("There isn't a file at this path: {}", path));
         match extension {

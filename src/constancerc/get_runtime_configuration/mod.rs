@@ -1,12 +1,12 @@
 use super::dto::ConstanceRc;
-use i_cli_args::ICliArgs;
-use i_file_system::{IFileSystem, RcFileExtension};
-use i_rc_parser::IRcParser;
+use abstraction::{
+    i_cli_args::ICliArgs,
+    i_file_system::{IFileSystem, RcFileExtension},
+    i_rc_parser::IRcParser,
+};
 
+pub mod abstraction;
 pub mod concrete;
-pub mod i_cli_args;
-pub mod i_file_system;
-pub mod i_rc_parser;
 
 pub fn get_runtime_configuration<'a>(
     cli_args: impl ICliArgs,

@@ -1,4 +1,4 @@
-use super::super::i_rc_parser::IRcParser;
+use super::super::abstraction::i_rc_parser::IRcParser;
 use crate::constancerc::dto::ConstanceRc;
 use serde_json::Result as JsonResult;
 use serde_yaml::Result as YamlResult;
