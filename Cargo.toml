@@ -1,5 +1,5 @@
 [package]
-name = "constance_rs"
+name = "constance"
 version = "0.1.0"
 authors = ["Jake Hamilton <jakehamtexas@gmail.com>"]
 edition = "2018"
