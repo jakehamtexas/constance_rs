@@ -1,5 +1,6 @@
 use serde::Deserialize;
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct QueryExecutionOptions {
     pub conn_string: String,
     pub query_timeout_in_ms: Option<i32>,

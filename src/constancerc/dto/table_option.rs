@@ -2,6 +2,7 @@ use super::table_identifier::TableIdentifier;
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct TableOption {
     pub identifier: TableIdentifier,
     pub key_column_name: String,

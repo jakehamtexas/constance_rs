@@ -10,8 +10,9 @@ pub mod language;
 use output_options::OutputOptions;
 use query_execution_options::QueryExecutionOptions;
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ConstanceRc {
     pub table_options: Vec<TableOption>,
-    pub output_options: OutputOptions,
+    pub output_options: Option<OutputOptions>,
     pub query_execution_options: QueryExecutionOptions,
 }
