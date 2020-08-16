@@ -1,0 +1,9 @@
+---
+tableOptions:
+  - identifier:
+      databaseName: ""
+      schemaName: ""
+      objectName: ""
+    valueColumnNames:
+      - ""
+queryExecutionOptions: {}

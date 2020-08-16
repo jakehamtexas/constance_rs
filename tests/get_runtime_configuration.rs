@@ -52,3 +52,23 @@ pub fn only_required_fields_from_yaml() {
     // assert
     only_required_fields::assert(rc);
 }
+
+#[test]
+#[should_panic]
+pub fn incomplete_fields_from_json() {
+    // arrange
+    let path = get_json("incomplete-fields");
+
+    // act
+    from_path(&path);
+}
+
+#[test]
+#[should_panic]
+pub fn incomplete_fields_from_yaml() {
+    // arrange
+    let path = get_yaml("incomplete-fields");
+
+    // act
+    from_path(&path);
+}
