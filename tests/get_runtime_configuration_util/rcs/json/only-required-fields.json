@@ -12,6 +12,7 @@
     }
   ],
   "queryExecutionOptions": {
-    "connString": ""
+    "connString": "",
+    "rdbms": ""
   }
 }

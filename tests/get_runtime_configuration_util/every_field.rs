@@ -33,10 +33,12 @@ pub fn assert(rc: ConstanceRc) {
 
     let query_execution_options = rc.query_execution_options;
     let conn_string = &query_execution_options.conn_string;
+    let rdbms = &query_execution_options.rdbms;
     let query_timeout_in_ms = query_execution_options.query_timeout_in_ms.unwrap();
     let should_parallelize = query_execution_options.should_parallelize.unwrap();
 
     string_assert(conn_string);
+    string_assert(rdbms);
     num_assert(query_timeout_in_ms);
     bool_assert(should_parallelize);
 }

@@ -11,10 +11,9 @@ fn main() {
     let rc_parser = RcParser {};
     let rc = get_runtime_configuration(cli_args, file_system, rc_parser);
 
-    let table_options = &rc.table_options;
-
     let db = get_database(&rc);
 
+    let table_options = &rc.table_options;
     let table_constants = get_table_constants(db, table_options);
 
     let output_options = &rc

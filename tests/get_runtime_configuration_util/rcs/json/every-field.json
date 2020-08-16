@@ -18,6 +18,7 @@
   },
   "queryExecutionOptions": {
     "connString": "",
+    "rdbms": "",
     "queryTimeoutInMs": 0,
     "shouldParallelize": false
   }

@@ -15,5 +15,6 @@ outputOptions:
   path: ""
 queryExecutionOptions:
   connString: ""
+  rdbms: ""
   queryTimeoutInMs: 0
   shouldParallelize: false
