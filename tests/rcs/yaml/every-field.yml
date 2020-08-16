@@ -1,0 +1,19 @@
+---
+tableOptions:
+  - identifier:
+      instanceName: ""
+      databaseName: ""
+      schemaName: ""
+      objectName: ""
+    keyColumnName: ""
+    valueColumnNames:
+      - ""
+    descriptionColumnName: ""
+outputOptions:
+  languageTargets:
+    - ""
+  path: ""
+queryExecutionOptions:
+  connString: ""
+  queryTimeoutInMs: 0
+  shouldParallelize: false
