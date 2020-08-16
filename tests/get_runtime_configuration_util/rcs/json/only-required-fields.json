@@ -1,0 +1,17 @@
+{
+  "tableOptions": [
+    {
+      "identifier": {
+        "instanceName": "",
+        "databaseName": "",
+        "schemaName": "",
+        "objectName": ""
+      },
+      "keyColumnName": "",
+      "valueColumnNames": [""]
+    }
+  ],
+  "queryExecutionOptions": {
+    "connString": ""
+  }
+}
