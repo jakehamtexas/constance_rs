@@ -1,4 +1,4 @@
-use super::rdbms::Rdbms;
+use crate::reader::rdbms::Rdbms;
 use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]

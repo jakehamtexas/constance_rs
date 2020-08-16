@@ -1,6 +1,5 @@
 pub mod output_options;
 pub mod query_execution_options;
-pub mod rdbms;
 pub mod table_identifier;
 pub mod table_option;
 

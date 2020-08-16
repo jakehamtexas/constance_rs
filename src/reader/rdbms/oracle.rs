@@ -1,7 +1,8 @@
-use super::read_db::ReadDb;
-pub struct MSSQL();
+use crate::reader::{read_db::ReadDb, value_with_description::ValueWithDescription};
+#[derive(Debug)]
+pub struct Oracle();
 
-impl ReadDb for MSSQL {
+impl ReadDb for Oracle {
     fn get_records_as_simple_key_value_pairs(
         &self,
         table_name: String,
@@ -11,8 +12,7 @@ impl ReadDb for MSSQL {
     fn get_records_with_meta_description_column(
         &self,
         table_name: String,
-    ) -> std::collections::HashMap<String, super::value_with_description::ValueWithDescription>
-    {
+    ) -> std::collections::HashMap<String, ValueWithDescription> {
         todo!()
     }
 }

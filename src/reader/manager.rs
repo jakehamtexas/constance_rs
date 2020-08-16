@@ -1,6 +1,4 @@
-use super::super::constancerc::dto::ConstanceRc;
-use super::mssql::MSSQL;
-use super::read_db::ReadDb;
-pub fn get_database(rc: &ConstanceRc) -> impl ReadDb {
-    MSSQL {}
+use super::{super::constancerc::dto::ConstanceRc, rdbms::Rdbms};
+pub fn get_database(rc: &ConstanceRc) -> Rdbms {
+    Rdbms::from_string(&rc.query_execution_options.rdbms)
 }
