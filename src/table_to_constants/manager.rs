@@ -3,5 +3,8 @@ use super::table_constant::TableConstant;
 use crate::reader::rdbms::Rdbms;
 
 pub fn get_table_constants(db: Rdbms, table_options: &Vec<TableOption>) -> Vec<TableConstant> {
-    vec![]
+    table_options
+        .iter()
+        .map(|option| TableConstant::from_option(option, &db))
+        .collect()
 }

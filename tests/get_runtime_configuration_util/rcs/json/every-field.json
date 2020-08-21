@@ -9,7 +9,8 @@
       },
       "keyColumnName": "",
       "valueColumnNames": [""],
-      "descriptionColumnName": ""
+      "descriptionColumnName": "",
+      "keyColumnType": ""
     }
   ],
   "outputOptions": {

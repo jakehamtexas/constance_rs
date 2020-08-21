@@ -8,4 +8,5 @@ pub struct TableOption {
     pub key_column_name: String,
     pub value_column_names: Vec<String>,
     pub description_column_name: Option<String>,
+    pub key_column_type: Option<String>,
 }

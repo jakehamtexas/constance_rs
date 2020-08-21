@@ -6,6 +6,7 @@ tableOptions:
       schemaName: ""
       objectName: ""
     keyColumnName: ""
+    keyColumnType: ""
     valueColumnNames:
       - ""
     descriptionColumnName: ""

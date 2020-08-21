@@ -1,3 +1,4 @@
+pub mod key_column_type;
 pub mod output_options;
 pub mod query_execution_options;
 pub mod table_identifier;

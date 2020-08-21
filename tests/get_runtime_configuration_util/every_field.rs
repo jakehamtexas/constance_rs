@@ -21,6 +21,7 @@ pub fn assert(rc: ConstanceRc) {
     let key_column_name = &table_option.key_column_name;
     let value_column_names = &table_option.value_column_names;
     let description_column_name = &table_option.description_column_name.as_ref().unwrap();
+    let key_column_type = &table_option.key_column_type.as_ref().unwrap();
 
     string_assert(instance_name);
     string_assert(database_name);
@@ -30,6 +31,7 @@ pub fn assert(rc: ConstanceRc) {
     string_assert(key_column_name);
     vec_assert(value_column_names);
     string_assert(description_column_name);
+    string_assert(key_column_type);
 
     let query_execution_options = rc.query_execution_options;
     let conn_string = &query_execution_options.conn_string;
