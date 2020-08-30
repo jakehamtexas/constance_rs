@@ -1,6 +1,16 @@
--- Select rows from a Table or View '*' in schema 'SchemaName'
--- This is a placeholder for the actual SQL we'll be running
--- to scaffold out and populate the integration test tables.
-SELECT
-	name
-FROM master.sys.databases
+CREATE DATABASE test
+
+CREATE TABLE simple_enum
+(
+	id INT IDENTITY(1,1) PRIMARY KEY,
+	name VARCHAR(255)
+)
+
+INSERT INTO simple_enum
+	(name)
+VALUES
+	('test1'),
+	('test2')
+
+SELECT *
+FROM simple_enum
