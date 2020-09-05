@@ -17,8 +17,6 @@ async fn main() {
     let table_options = &rc.table_options;
     let table_constants = get_table_constants(db, table_options).await;
 
-    let output_options = &rc
-        .output_options
-        .unwrap_or_else(|| OutputOptions::default());
+    let output_options = &rc.output_options.unwrap_or_else(OutputOptions::default);
     write_files_for_targets(&table_constants, &output_options);
 }

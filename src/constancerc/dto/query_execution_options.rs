@@ -13,7 +13,7 @@ impl Default for QueryExecutionOptions {
     fn default() -> Self {
         Self {
             conn_string: String::from(""),
-            rdbms: Rdbms::default().to_string(),
+            rdbms: Rdbms::default().to_rc_string(),
             query_timeout_in_ms: Some(1000),
             should_parallelize: Some(false),
         }

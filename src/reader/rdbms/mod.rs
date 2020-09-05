@@ -23,7 +23,7 @@ impl Default for Rdbms {
 }
 
 impl Rdbms {
-    pub fn to_string(&self) -> String {
+    pub fn to_rc_string(&self) -> String {
         let val = match self {
             Rdbms::Mssql(_) => "mssql",
             Rdbms::Postgres(_) => "postgres",
