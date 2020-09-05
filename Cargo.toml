@@ -14,3 +14,4 @@ edition = "2018"
   tokio-util = { version = "0.3.1", features = ["compat"] }
   futures = "0.3.5"
   tiberius = { version = "0.4.9", features = ["tls"] }
+  async-trait = "0.1.40"
