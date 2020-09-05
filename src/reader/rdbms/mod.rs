@@ -1,3 +1,6 @@
+use crate::constancerc::dto::{
+    connection::Connection, query_execution_options::QueryExecutionOptions,
+};
 use mssql::Mssql;
 use ole_db::OleDb;
 use oracle::Oracle;
@@ -7,6 +10,11 @@ pub mod mssql;
 pub mod ole_db;
 pub mod oracle;
 pub mod postgres;
+
+const MSSQL: &str = "mssql";
+const POSTGRES: &str = "postgres";
+const ORACLE: &str = "oracle";
+const OLEDB: &str = "oledb";
 
 #[derive(Debug)]
 pub enum Rdbms {
@@ -18,27 +26,29 @@ pub enum Rdbms {
 
 impl Default for Rdbms {
     fn default() -> Self {
-        Rdbms::Mssql(Mssql {})
+        Rdbms::Mssql(Mssql::new(Connection::default()))
     }
 }
 
 impl Rdbms {
     pub fn to_rc_string(&self) -> String {
         let val = match self {
-            Rdbms::Mssql(_) => "mssql",
-            Rdbms::Postgres(_) => "postgres",
-            Rdbms::Oracle(_) => "oracle",
-            Rdbms::OleDb(_) => "oledb",
+            Rdbms::Mssql(_) => MSSQL,
+            Rdbms::Postgres(_) => POSTGRES,
+            Rdbms::Oracle(_) => ORACLE,
+            Rdbms::OleDb(_) => OLEDB,
         };
         val.to_owned()
     }
-    pub fn from_string(from: &str) -> Self {
-        match from {
-            "mssql" => Rdbms::Mssql(Mssql {}),
-            "postgres" => Rdbms::Postgres(Postgres {}),
-            "oracle" => Rdbms::Oracle(Oracle {}),
-            "oledb" => Rdbms::OleDb(OleDb {}),
-            _ => panic!("Unrecognized rdbms: {}", from),
+    pub fn from_options(options: &QueryExecutionOptions) -> Self {
+        let connection = options.connection.clone();
+        let rdbms = &*options.rdbms;
+        match rdbms {
+            MSSQL => Rdbms::Mssql(Mssql::new(connection)),
+            POSTGRES => Rdbms::Postgres(Postgres {}),
+            ORACLE => Rdbms::Oracle(Oracle {}),
+            OLEDB => Rdbms::OleDb(OleDb {}),
+            _ => panic!("Unrecognized rdbms: {}", rdbms),
         }
     }
 }

@@ -39,7 +39,7 @@ impl TableConstant {
         let key_column_type = get_key_column_type(option);
         match (key_column_type, has_description, has_multiple_values) {
             (KeyColumnType::Number, false, false) => {
-                TableConstant::SimpleEnum(SimpleEnum::new(option, db))
+                TableConstant::SimpleEnum(SimpleEnum::new(option, db).await)
             }
             (KeyColumnType::Number, true, false) => {
                 TableConstant::SimpleEnumWithDescription(SimpleEnumWithDescription::new(option, db))
