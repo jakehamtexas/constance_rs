@@ -12,7 +12,11 @@
     }
   ],
   "queryExecutionOptions": {
-    "connString": "",
+    "connection": {
+      "connectionOptions": {
+        "password": ""
+      }
+    },
     "rdbms": ""
   }
 }

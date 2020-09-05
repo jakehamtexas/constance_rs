@@ -1,9 +1,10 @@
+use super::connection::Connection;
 use crate::reader::rdbms::Rdbms;
 use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryExecutionOptions {
-    pub conn_string: String,
+    pub connection: Connection,
     pub rdbms: String,
     pub query_timeout_in_ms: Option<i32>,
     pub should_parallelize: Option<bool>,
@@ -12,19 +13,10 @@ pub struct QueryExecutionOptions {
 impl Default for QueryExecutionOptions {
     fn default() -> Self {
         Self {
-            conn_string: String::from(""),
+            connection: Connection::default(),
             rdbms: Rdbms::default().to_rc_string(),
             query_timeout_in_ms: Some(1000),
             should_parallelize: Some(false),
-        }
-    }
-}
-
-impl QueryExecutionOptions {
-    pub fn default_with_conn_string(conn_string: String) -> QueryExecutionOptions {
-        QueryExecutionOptions {
-            conn_string,
-            ..Default::default()
         }
     }
 }

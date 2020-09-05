@@ -15,7 +15,13 @@ outputOptions:
     - ""
   path: ""
 queryExecutionOptions:
-  connString: ""
+  connection:
+    connectionString: ""
+    connectionOptions:
+      host: ""
+      port: 0
+      userName: ""
+      password: ""
   rdbms: ""
   queryTimeoutInMs: 0
   shouldParallelize: false
