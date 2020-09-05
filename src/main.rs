@@ -5,7 +5,8 @@ use constance::{
     types::{CliArgs, FileSystem, OutputOptions, RcParser},
 };
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let cli_args = CliArgs {};
     let file_system = FileSystem {};
     let rc_parser = RcParser {};
@@ -14,7 +15,7 @@ fn main() {
     let db = get_database(&rc);
 
     let table_options = &rc.table_options;
-    let table_constants = get_table_constants(db, table_options);
+    let table_constants = get_table_constants(db, table_options).await;
 
     let output_options = &rc
         .output_options

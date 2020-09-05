@@ -33,7 +33,7 @@ fn get_key_column_type(option: &TableOption) -> KeyColumnType {
 }
 
 impl TableConstant {
-    pub fn from_option(option: &TableOption, db: &Rdbms) -> Self {
+    pub async fn from_option(option: &TableOption, db: &Rdbms) -> Self {
         let has_description = option.description_column_name.is_some();
         let has_multiple_values = option.value_column_names.len() > 1;
         let key_column_type = get_key_column_type(option);
