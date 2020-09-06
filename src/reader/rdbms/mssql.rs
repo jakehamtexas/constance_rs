@@ -1,12 +1,13 @@
 use crate::{
     constancerc::dto::{
-        connection::Connection, connection_options::ConnectionOptions, table_option::TableOption,
+        connection::Connection, connection_options::ConnectionOptions,
+        key_column_type::KeyColumnType, table_option::TableOption,
     },
     reader::{read_db::ReadDb, value_with_description::ValueWithDescription},
 };
 use async_trait::async_trait;
 use std::collections::HashMap;
-use tiberius::{AuthMethod, Client, Config};
+use tiberius::{AuthMethod, Client, Config, FromSql, Row};
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, Tokio02AsyncWriteCompatExt};
 
@@ -58,6 +59,16 @@ impl Mssql {
     }
 }
 
+fn get_column<'a, ToStringable: ToString + FromSql<'a>>(
+    row: &'a Row,
+    column_name: &str,
+) -> Option<String> {
+    match row.get::<ToStringable, &str>(column_name) {
+        Some(i) => Some(i.to_string()),
+        None => None,
+    }
+}
+
 #[async_trait]
 impl ReadDb for Mssql {
     async fn get_records_as_simple_key_value_pairs(
@@ -68,25 +79,35 @@ impl ReadDb for Mssql {
         let key_column_name = &table_option.key_column_name;
         let value_column_name = table_option.value_column_names.first().unwrap();
 
-        let query_result = client
+        let query = client
             .query(
                 format!("SELECT {}, {}", key_column_name, value_column_name),
                 &[],
             )
-            .await;
-        let rows = match query_result {
-            Ok(query) => query.into_first_result().await.unwrap(),
+            .await
+            .map(|query| query.into_first_result());
+
+        let rows = match query {
+            Ok(rows) => rows.await,
             _ => panic!("No results for given query parameters: [ key_column_name: {}, value_column_name: {} ]", key_column_name, value_column_name)
         };
 
-        rows.into_iter().fold(HashMap::new(), |mut map, row| {
-            let key_column = row.get::<i32, &str>(key_column_name);
-            let value_column = row.get::<&str, &str>(value_column_name);
-            if let (Some(key), Some(value)) = (key_column, value_column) {
-                map.insert(key.to_string().to_owned(), value.to_owned());
-            }
-            map
+        let key_column_type = KeyColumnType::from_option(&table_option.key_column_type);
+
+        rows.map(|rows| {
+            rows.into_iter().fold(HashMap::new(), |mut map, row| {
+                let key_column = match &key_column_type {
+                    KeyColumnType::Number => get_column::<i32>(&row, key_column_name),
+                    KeyColumnType::String => get_column::<&str>(&row, key_column_name),
+                };
+                let value_column = get_column::<&str>(&row, value_column_name);
+                if let (Some(key), Some(value)) = (key_column, value_column) {
+                    map.insert(key, value);
+                }
+                map
+            })
         })
+        .unwrap()
     }
 
     async fn get_records_with_meta_description_column(

@@ -37,7 +37,7 @@ impl TableConstant {
                 TableConstant::SimpleEnumWithDescription(SimpleEnumWithDescription::new(option, db))
             }
             (KeyColumnType::String, false, false) => {
-                TableConstant::StringEnum(StringEnum::new(option, db))
+                TableConstant::StringEnum(StringEnum::new(option, db).await)
             }
             (KeyColumnType::String, true, false) => {
                 TableConstant::StringEnumWithDescription(StringEnumWithDescription::new(option, db))
