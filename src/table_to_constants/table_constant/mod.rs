@@ -24,19 +24,11 @@ pub enum TableConstant {
     ObjectLikeWithDescription(ObjectLikeWithDescription),
 }
 
-fn get_key_column_type(option: &TableOption) -> KeyColumnType {
-    let key_column_type = match option.key_column_type {
-        Some(ref key_column) => &key_column,
-        None => "string",
-    };
-    KeyColumnType::from_string(key_column_type)
-}
-
 impl TableConstant {
     pub async fn from_option(option: &TableOption, db: &Rdbms) -> Self {
         let has_description = option.description_column_name.is_some();
         let has_multiple_values = option.value_column_names.len() > 1;
-        let key_column_type = get_key_column_type(option);
+        let key_column_type = KeyColumnType::from_option(&option.key_column_type);
         match (key_column_type, has_description, has_multiple_values) {
             (KeyColumnType::Number, false, false) => {
                 TableConstant::SimpleEnum(SimpleEnum::new(option, db).await)
