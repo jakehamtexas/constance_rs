@@ -1,4 +1,4 @@
-use super::{connection_options::ConnectionOptions, language::Language};
+use super::connection_options::ConnectionOptions;
 use serde::Deserialize;
 #[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
