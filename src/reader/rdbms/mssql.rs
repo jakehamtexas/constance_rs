@@ -7,7 +7,7 @@ use crate::{
 };
 use async_trait::async_trait;
 use std::collections::HashMap;
-use tiberius::{AuthMethod, Client, Config, FromSql, Row};
+use tiberius::{error::Error, AuthMethod, Client, Config, FromSql, Row};
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, Tokio02AsyncWriteCompatExt};
 
@@ -50,7 +50,7 @@ impl Mssql {
         config
     }
 
-    pub async fn get_client(&self, table_option: &TableOption) -> Client<Compat<TcpStream>> {
+    async fn get_client(&self, table_option: &TableOption) -> Client<Compat<TcpStream>> {
         let config = self.get_config(&table_option.identifier.database_name);
         let tcp = TcpStream::connect(config.get_addr()).await.unwrap();
         tcp.set_nodelay(true).unwrap();
@@ -69,38 +69,61 @@ fn get_column<'a, ToStringable: ToString + FromSql<'a>>(
     }
 }
 
+fn get_select_statement(columns: &[&str]) -> String {
+    format!("SELECT {}", columns.join(", "))
+}
+
+fn get_panic_message(columns: &[&str]) -> String {
+    format!(
+        "No results for given query parameters: [ {} ]",
+        columns.join(", ")
+    )
+}
+
+async fn get_rows(
+    mut client: Client<Compat<TcpStream>>,
+    columns: &[&str],
+) -> Result<Vec<Row>, Error> {
+    let query = client
+        .query(get_select_statement(columns), &[])
+        .await
+        .map(|query| query.into_first_result());
+    match query {
+        Ok(query) => query.await,
+        _ => panic!(get_panic_message(columns)),
+    }
+}
+
+fn get_key_column(
+    row: &Row,
+    key_column_type: &KeyColumnType,
+    key_column_name: &str,
+) -> Option<String> {
+    match key_column_type {
+        KeyColumnType::Number => get_column::<i32>(&row, key_column_name),
+        KeyColumnType::String => get_column::<&str>(&row, key_column_name),
+    }
+}
+
 #[async_trait]
 impl ReadDb for Mssql {
     async fn get_records_as_simple_key_value_pairs(
         &self,
         table_option: &TableOption,
     ) -> HashMap<String, String> {
-        let mut client = self.get_client(table_option).await;
         let key_column_name = &table_option.key_column_name;
         let value_column_name = table_option.value_column_names.first().unwrap();
+        let columns: [&str; 2] = [key_column_name, value_column_name];
 
-        let query = client
-            .query(
-                format!("SELECT {}, {}", key_column_name, value_column_name),
-                &[],
-            )
-            .await
-            .map(|query| query.into_first_result());
-
-        let rows = match query {
-            Ok(rows) => rows.await,
-            _ => panic!("No results for given query parameters: [ key_column_name: {}, value_column_name: {} ]", key_column_name, value_column_name)
-        };
+        let client = self.get_client(table_option).await;
+        let rows = get_rows(client, &columns).await;
 
         let key_column_type = KeyColumnType::from_option(&table_option.key_column_type);
 
         rows.map(|rows| {
-            rows.into_iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = match &key_column_type {
-                    KeyColumnType::Number => get_column::<i32>(&row, key_column_name),
-                    KeyColumnType::String => get_column::<&str>(&row, key_column_name),
-                };
-                let value_column = get_column::<&str>(&row, value_column_name);
+            rows.iter().fold(HashMap::new(), |mut map, row| {
+                let key_column = get_key_column(row, &key_column_type, key_column_name);
+                let value_column = get_column::<&str>(row, value_column_name);
                 if let (Some(key), Some(value)) = (key_column, value_column) {
                     map.insert(key, value);
                 }
@@ -114,6 +137,32 @@ impl ReadDb for Mssql {
         &self,
         table_option: &TableOption,
     ) -> HashMap<String, ValueWithDescription> {
-        todo!()
+        let key_column_name = &table_option.key_column_name;
+        let value_column_name = table_option.value_column_names.first().unwrap();
+        let description_column_name = match &table_option.description_column_name {
+            Some(ref d) => d,
+            None => "",
+        };
+        let columns = [key_column_name, value_column_name, description_column_name];
+
+        let client = self.get_client(table_option).await;
+        let rows = get_rows(client, &columns).await;
+
+        let key_column_type = KeyColumnType::from_option(&table_option.key_column_type);
+
+        rows.map(|rows| {
+            rows.iter().fold(HashMap::new(), |mut map, row| {
+                let key_column = get_key_column(row, &key_column_type, key_column_name);
+                let value_column = get_column::<&str>(row, value_column_name);
+                let description =
+                    get_column::<&str>(row, description_column_name).unwrap_or_default();
+                if let (Some(key), Some(value)) = (key_column, value_column) {
+                    let value_with_description = ValueWithDescription { value, description };
+                    map.insert(key, value_with_description);
+                }
+                map
+            })
+        })
+        .unwrap()
     }
 }

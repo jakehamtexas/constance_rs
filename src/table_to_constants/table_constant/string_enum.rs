@@ -13,6 +13,6 @@ impl StringEnum {
             _ => panic!("Unimplemented string enum query!"),
         }
         .await;
-        StringEnum { map }
+        Self { map }
     }
 }

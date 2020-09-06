@@ -14,6 +14,6 @@ impl SimpleEnum {
             _ => panic!("Unimplemented simple enum query!"),
         };
 
-        SimpleEnum { map }
+        Self { map }
     }
 }

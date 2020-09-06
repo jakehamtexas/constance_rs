@@ -33,15 +33,15 @@ impl TableConstant {
             (KeyColumnType::Number, false, false) => {
                 TableConstant::SimpleEnum(SimpleEnum::new(option, db).await)
             }
-            (KeyColumnType::Number, true, false) => {
-                TableConstant::SimpleEnumWithDescription(SimpleEnumWithDescription::new(option, db))
-            }
+            (KeyColumnType::Number, true, false) => TableConstant::SimpleEnumWithDescription(
+                SimpleEnumWithDescription::new(option, db).await,
+            ),
             (KeyColumnType::String, false, false) => {
                 TableConstant::StringEnum(StringEnum::new(option, db).await)
             }
-            (KeyColumnType::String, true, false) => {
-                TableConstant::StringEnumWithDescription(StringEnumWithDescription::new(option, db))
-            }
+            (KeyColumnType::String, true, false) => TableConstant::StringEnumWithDescription(
+                StringEnumWithDescription::new(option, db).await,
+            ),
             (KeyColumnType::String, false, true) => {
                 TableConstant::ObjectLike(ObjectLike::new(option, db))
             }
