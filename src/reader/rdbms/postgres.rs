@@ -23,4 +23,18 @@ impl ReadDb for Postgres {
     ) -> HashMap<String, ValueWithDescription> {
         todo!()
     }
+
+    async fn get_records_as_object_like(
+        &self,
+        table_option: &TableOption,
+    ) -> HashMap<String, Vec<(String, String)>> {
+        todo!()
+    }
+
+    async fn get_records_as_object_like_with_descriptions(
+        &self,
+        table_option: &TableOption,
+    ) -> HashMap<String, Vec<(String, ValueWithDescription)>> {
+        todo!()
+    }
 }
