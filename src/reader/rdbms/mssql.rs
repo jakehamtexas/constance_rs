@@ -168,14 +168,14 @@ impl ReadDb for Mssql {
 
     async fn get_records_as_object_like(
         &self,
-        table_option: &TableOption,
+        _table_option: &TableOption,
     ) -> HashMap<String, Vec<(String, String)>> {
         todo!()
     }
 
     async fn get_records_as_object_like_with_descriptions(
         &self,
-        table_option: &TableOption,
+        _table_option: &TableOption,
     ) -> HashMap<String, Vec<(String, ValueWithDescription)>> {
         todo!()
     }

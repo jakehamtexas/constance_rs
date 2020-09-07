@@ -10,7 +10,6 @@ impl StringEnumWithDescription {
     pub async fn new(option: &TableOption, db: &Rdbms) -> Self {
         let map = match db {
             Rdbms::Mssql(db) => db.get_records_with_meta_description_column(option).await,
-            _ => panic!("Unimplemented string enum with description query!"),
         };
 
         Self { map }

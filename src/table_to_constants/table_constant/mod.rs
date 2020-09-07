@@ -43,11 +43,11 @@ impl TableConstant {
                 StringEnumWithDescription::new(option, db).await,
             ),
             (KeyColumnType::String, false, true) => {
-                TableConstant::ObjectLike(ObjectLike::new(option, db))
+                TableConstant::ObjectLike(ObjectLike::new(option, db).await)
             }
-            (KeyColumnType::String, true, true) => {
-                TableConstant::ObjectLikeWithDescription(ObjectLikeWithDescription::new(option, db))
-            }
+            (KeyColumnType::String, true, true) => TableConstant::ObjectLikeWithDescription(
+                ObjectLikeWithDescription::new(option, db).await,
+            ),
             _ => panic!("Unimplemented table option configuration"),
         }
     }
