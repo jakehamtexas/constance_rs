@@ -14,6 +14,19 @@ pub struct ConnectionOptions {
 }
 
 impl ConnectionOptions {
+    pub fn new(
+        host: Option<String>,
+        port: Option<u16>,
+        user_name: Option<String>,
+        password: String,
+    ) -> Self {
+        Self {
+            host,
+            port,
+            user_name,
+            password,
+        }
+    }
     pub fn get_host(&self) -> String {
         match &self.host {
             Some(host) => host.to_owned(),
@@ -34,5 +47,14 @@ impl ConnectionOptions {
 
     pub fn get_password(&self) -> String {
         self.password.to_owned()
+    }
+
+    pub fn empty() -> Self {
+        Self {
+            host: Some("".to_string()),
+            port: Some(0),
+            password: "".to_string(),
+            user_name: Some("".to_string()),
+        }
     }
 }

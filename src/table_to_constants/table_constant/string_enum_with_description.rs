@@ -3,6 +3,7 @@ use crate::{
     reader::{rdbms::Rdbms, read_db::ReadDb, value_with_description::ValueWithDescription},
 };
 use std::collections::HashMap;
+#[derive(Debug)]
 pub struct StringEnumWithDescription {
     pub map: HashMap<String, ValueWithDescription>,
 }

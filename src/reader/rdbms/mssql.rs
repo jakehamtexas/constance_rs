@@ -1,13 +1,14 @@
+use crate::constancerc::dto::column::Column;
 use crate::{
     constancerc::dto::{
-        connection::Connection, connection_options::ConnectionOptions,
-        key_column_type::KeyColumnType, table_option::TableOption,
+        column_type::ColumnType, connection::Connection, connection_options::ConnectionOptions,
+        table_option::TableOption,
     },
     reader::{read_db::ReadDb, value_with_description::ValueWithDescription},
 };
 use async_trait::async_trait;
 use std::collections::HashMap;
-use tiberius::{error::Error, AuthMethod, Client, Config, FromSql, Row};
+use tiberius::{error::Error, AuthMethod, Client, Config, EncryptionLevel, FromSql, Row};
 use tokio::net::TcpStream;
 use tokio_util::compat::{Compat, Tokio02AsyncWriteCompatExt};
 
@@ -24,6 +25,7 @@ fn from_options(options: &ConnectionOptions) -> Config {
         &options.get_user_name(),
         &options.get_password(),
     ));
+    config.encryption(EncryptionLevel::NotSupported);
     config
 }
 
@@ -54,7 +56,6 @@ impl Mssql {
         let config = self.get_config(&table_option.identifier.database_name);
         let tcp = TcpStream::connect(config.get_addr()).await.unwrap();
         tcp.set_nodelay(true).unwrap();
-
         Client::connect(config, tcp.compat_write()).await.unwrap()
     }
 }
@@ -69,8 +70,8 @@ fn get_column<'a, ToStringable: ToString + FromSql<'a>>(
     }
 }
 
-fn get_select_statement(columns: &[&str]) -> String {
-    format!("SELECT {}", columns.join(", "))
+fn get_select_statement(columns: &[&str], table_identifier: &str) -> String {
+    format!("SELECT {} FROM {}", columns.join(", "), table_identifier)
 }
 
 fn get_panic_message(columns: &[&str]) -> String {
@@ -83,26 +84,35 @@ fn get_panic_message(columns: &[&str]) -> String {
 async fn get_rows(
     mut client: Client<Compat<TcpStream>>,
     columns: &[&str],
+    table_identifier: &str,
 ) -> Result<Vec<Row>, Error> {
     let query = client
-        .query(get_select_statement(columns), &[])
+        .query(get_select_statement(columns, table_identifier), &[])
         .await
         .map(|query| query.into_first_result());
     match query {
         Ok(query) => query.await,
-        _ => panic!(get_panic_message(columns)),
+        Err(_) => panic!(get_panic_message(columns)),
     }
 }
 
-fn get_key_column(
-    row: &Row,
-    key_column_type: &KeyColumnType,
-    key_column_name: &str,
-) -> Option<String> {
-    match key_column_type {
-        KeyColumnType::Number => get_column::<i32>(&row, key_column_name),
-        KeyColumnType::String => get_column::<&str>(&row, key_column_name),
+fn get_column_of_unknown_type(row: &Row, column: &Column) -> Option<String> {
+    let column_type = &column.data_type;
+    let column_name = &column.name;
+    match ColumnType::from_string(column_type) {
+        ColumnType::Number => get_column::<i32>(&row, &column_name),
+        ColumnType::String => get_column::<&str>(&row, &column_name),
     }
+}
+
+fn get_table_identifier(table_option: &TableOption) -> String {
+    let identifier = &table_option.identifier;
+    vec![
+        identifier.database_name.clone(),
+        identifier.schema_name.clone(),
+        identifier.object_name.clone(),
+    ]
+    .join(".")
 }
 
 #[async_trait]
@@ -112,18 +122,17 @@ impl ReadDb for Mssql {
         table_option: &TableOption,
     ) -> HashMap<String, String> {
         let key_column_name = &table_option.key_column_name;
-        let value_column_name = table_option.value_column_names.first().unwrap();
-        let columns: [&str; 2] = [key_column_name, value_column_name];
+        let value_column = table_option.value_columns.first().unwrap();
+        let columns: [&str; 2] = [key_column_name, &value_column.name];
 
         let client = self.get_client(table_option).await;
-        let rows = get_rows(client, &columns).await;
-
-        let key_column_type = KeyColumnType::from_option(&table_option.key_column_type);
+        let identifier = get_table_identifier(table_option);
+        let rows = get_rows(client, &columns, &identifier).await;
 
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_key_column(row, &key_column_type, key_column_name);
-                let value_column = get_column::<&str>(row, value_column_name);
+                let key_column = get_column::<&str>(row, key_column_name); //get_key_column(row, &ColumnType::String, key_column_name);
+                let value_column = get_column_of_unknown_type(row, value_column);
                 if let (Some(key), Some(value)) = (key_column, value_column) {
                     map.insert(key, value);
                 }
@@ -138,22 +147,21 @@ impl ReadDb for Mssql {
         table_option: &TableOption,
     ) -> HashMap<String, ValueWithDescription> {
         let key_column_name = &table_option.key_column_name;
-        let value_column_name = table_option.value_column_names.first().unwrap();
+        let value_column = table_option.value_columns.first().unwrap();
         let description_column_name = match &table_option.description_column_name {
             Some(ref d) => d,
             None => "",
         };
-        let columns = [key_column_name, value_column_name, description_column_name];
+        let columns = [key_column_name, &value_column.name, description_column_name];
 
         let client = self.get_client(table_option).await;
-        let rows = get_rows(client, &columns).await;
-
-        let key_column_type = KeyColumnType::from_option(&table_option.key_column_type);
+        let identifier = get_table_identifier(table_option);
+        let rows = get_rows(client, &columns, &identifier).await;
 
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_key_column(row, &key_column_type, key_column_name);
-                let value_column = get_column::<&str>(row, value_column_name);
+                let key_column = get_column::<&str>(row, &key_column_name); // get_column_of_unknown_type(row, &key_column_type, key_column_name);
+                let value_column = get_column_of_unknown_type(row, &value_column);
                 let description =
                     get_column::<&str>(row, description_column_name).unwrap_or_default();
                 if let (Some(key), Some(value)) = (key_column, value_column) {

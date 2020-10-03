@@ -5,7 +5,7 @@ use mssql::Mssql;
 
 pub mod mssql;
 
-const MSSQL: &str = "mssql";
+pub const MSSQL: &str = "mssql";
 
 #[derive(Debug)]
 pub enum Rdbms {

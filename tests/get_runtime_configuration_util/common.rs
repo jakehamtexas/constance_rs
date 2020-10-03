@@ -1,17 +1,10 @@
 use constance::{
     functions::get_runtime_configuration,
-    types::{ConstanceRc, FileSystem, ICliArgs, RcParser},
+    testing_only::ConstanceRc,
+    types::{FileSystem, RcParser},
 };
 
-pub struct FromPath<'a> {
-    pub path: &'a str,
-}
-
-impl ICliArgs for FromPath<'_> {
-    fn _get_args(&self) -> Vec<String> {
-        vec![self.path.to_owned()]
-    }
-}
+use super::super::common::from_path::FromPath;
 
 pub fn from_path(path: &str) -> ConstanceRc {
     let cli_args = FromPath { path };

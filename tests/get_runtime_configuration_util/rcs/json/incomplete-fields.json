@@ -3,10 +3,11 @@
     {
       "identifier": {
         "databaseName": "",
-        "schemaName": "",
-        "objectName": ""
+        "schemaName": ""
       },
-      "valueColumnNames": [""]
+      "valueColumns": [{
+        "name": ""
+      }]
     }
   ],
   "queryExecutionOptions": {}

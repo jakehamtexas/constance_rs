@@ -1,13 +1,13 @@
 ---
 tableOptions:
   - identifier:
-      instanceName: ""
       databaseName: ""
       schemaName: ""
       objectName: ""
     keyColumnName: ""
-    valueColumnNames:
-      - ""
+    valueColumns:
+      - name: ""
+        dataType: ""
 queryExecutionOptions:
   connection:
     connectionOptions:

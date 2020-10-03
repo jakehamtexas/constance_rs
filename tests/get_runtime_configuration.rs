@@ -3,6 +3,7 @@ use get_runtime_configuration_util::{
     every_field, only_required_fields,
 };
 
+mod common;
 mod get_runtime_configuration_util;
 
 #[test]

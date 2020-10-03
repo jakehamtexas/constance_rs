@@ -65,6 +65,8 @@ fn main() {
         serde_json::from_str::<Vec<&str>>(&simple_enum_buf).expect("Unable to deserialize!");
 
     let create_database_statement = "CREATE DATABASE `test`".to_string();
+    let go_statement = "GO";
+    let use_statement = "USE test";
 
     let id_column = Column::Pkey;
     let name_column = Column::Text("name");
@@ -98,8 +100,13 @@ fn main() {
     );
     let sql = vec![
         create_database_statement,
+        go_statement.to_string(),
+        use_statement.to_string(),
         simple_enum_create_table,
+        go_statement.to_string(),
+        use_statement.to_string(),
         simple_enum_insert,
+        go_statement.to_string(),
     ]
     .join("\n")
     .replace("`", "");

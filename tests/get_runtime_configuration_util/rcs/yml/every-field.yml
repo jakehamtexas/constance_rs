@@ -1,14 +1,14 @@
 ---
 tableOptions:
   - identifier:
-      instanceName: ""
       databaseName: ""
       schemaName: ""
       objectName: ""
     keyColumnName: ""
-    keyColumnType: ""
-    valueColumnNames:
-      - ""
+    ColumnType: ""
+    valueColumns:
+      - name: ""
+        dataType: ""
     descriptionColumnName: ""
 outputOptions:
   languageTargets:
