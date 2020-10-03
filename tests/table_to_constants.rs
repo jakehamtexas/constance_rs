@@ -9,6 +9,7 @@ mod common;
 mod table_to_constants_util;
 
 #[tokio::test]
+#[ignore = "requires test script for setup/teardown"]
 pub async fn table_to_constants_mssql_simple_enum() {
     // arrange
     let connection_options = get_connection_options_from_env();
