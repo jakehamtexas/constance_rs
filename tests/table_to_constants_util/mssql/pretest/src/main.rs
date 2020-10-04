@@ -52,6 +52,24 @@ fn get_raw_insert_statement(
         .compile()
 }
 
+fn get_sql(statements: &[&str]) -> String {
+    let create_database_staement = "CREATE DATABASE `test`";
+    let use_statement = "USE test";
+    let go_statement = "GO";
+
+    let padded_statements = statements
+        .into_iter()
+        .flat_map(|statement| vec![use_statement, statement, go_statement])
+        .collect::<Vec<_>>();
+
+    vec![create_database_staement, go_statement]
+        .into_iter()
+        .chain(padded_statements)
+        .collect::<Vec<&str>>()
+        .join("\n")
+        .replace("`", "")
+}
+
 use std::env;
 fn main() {
     let args = env::args().collect::<Vec<_>>();
@@ -63,10 +81,6 @@ fn main() {
     let simple_enum_buf = get_file_contents(&simple_enum_path).expect("Invalid directory path!");
     let simple_enum_json =
         serde_json::from_str::<Vec<&str>>(&simple_enum_buf).expect("Unable to deserialize!");
-
-    let create_database_statement = "CREATE DATABASE `test`".to_string();
-    let go_statement = "GO";
-    let use_statement = "USE test";
 
     let id_column = Column::Pkey;
     let name_column = Column::Text("name");
@@ -98,18 +112,6 @@ fn main() {
             [before.to_owned(), between_with_value, after_with_value].join("")
         },
     );
-    let sql = vec![
-        create_database_statement,
-        go_statement.to_string(),
-        use_statement.to_string(),
-        simple_enum_create_table,
-        go_statement.to_string(),
-        use_statement.to_string(),
-        simple_enum_insert,
-        go_statement.to_string(),
-    ]
-    .join("\n")
-    .replace("`", "");
-
+    let sql = get_sql(&[&simple_enum_create_table, &simple_enum_insert]);
     std::fs::write("../init.sql", sql).expect("Unable to write to file.");
 }
