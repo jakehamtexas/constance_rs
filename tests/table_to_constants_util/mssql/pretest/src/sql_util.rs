@@ -37,11 +37,3 @@ pub fn get_raw_insert_statement(
         .batch(batch_size)
         .compile()
 }
-
-pub fn without_first_char(s: &str) -> String {
-    s.char_indices()
-        .next()
-        .and_then(|(i, _)| s.get(i + 1..))
-        .unwrap_or("")
-        .to_owned()
-}
