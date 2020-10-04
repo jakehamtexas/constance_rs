@@ -3,3 +3,6 @@ pub enum Column<'a> {
     Text(&'a str),
     Number(&'a str),
 }
+
+pub static ID_COLUMN: Column = Column::Pkey;
+pub static NAME_COLUMN: Column = Column::Text("name");
