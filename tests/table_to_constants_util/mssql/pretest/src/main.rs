@@ -1,9 +1,12 @@
 use column::Column;
+use create_table::get_create_table_statement;
 use sql::prelude::*;
 use std::fs::File;
 use std::io::{prelude::*, Error};
 
 mod column;
+mod create_table;
+
 fn get_file_contents(path: &str) -> Result<String, Error> {
     let mut file = File::open(path)?;
     let mut contents = String::new();
@@ -17,19 +20,6 @@ fn without_first_char(s: &str) -> String {
         .and_then(|(i, _)| s.get(i + 1..))
         .unwrap_or("")
         .to_owned()
-}
-
-fn get_create_table_statement(table_name: &str, columns: &[&Column]) -> Result<String, sql::Error> {
-    columns
-        .iter()
-        .fold(create_table(table_name), |create_table, column| {
-            create_table.column(match column {
-                Column::Pkey => "id".integer().not_null(),
-                Column::Text(name) => name.string(),
-                Column::Number(name) => name.integer(),
-            })
-        })
-        .compile()
 }
 
 fn get_raw_insert_statement(
