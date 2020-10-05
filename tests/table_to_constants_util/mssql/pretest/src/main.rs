@@ -1,14 +1,18 @@
 #![feature(str_split_once)]
 use serde::Deserialize;
+use simple_enum_with_description::SimpleEnumWithDescription;
 use std::fs::File;
 use std::io::{prelude::*, Error};
 use string_enum::StringEnum;
+use string_enum_with_description::StringEnumWithDescription;
 
 mod column;
 mod insert_utils;
 mod simple_enum;
+mod simple_enum_with_description;
 mod sql_util;
 mod string_enum;
+mod string_enum_with_description;
 
 fn get_file_contents(path: &str) -> Result<String, Error> {
     let mut file = File::open(path)?;
@@ -61,18 +65,41 @@ fn main() {
     let string_enum_buf = get_buf(dir_path, "string_enum").unwrap();
     let string_enum_json = get_json::<StringEnum>(&string_enum_buf).unwrap();
 
+    let simple_enum_with_description_buf =
+        get_buf(dir_path, "simple_enum_with_description").unwrap();
+    let simple_enum_with_description_json =
+        get_json::<SimpleEnumWithDescription>(&simple_enum_with_description_buf).unwrap();
+
+    let string_enum_with_description_buf =
+        get_buf(dir_path, "string_enum_with_description").unwrap();
+    let string_enum_with_description_json =
+        get_json::<StringEnumWithDescription>(&string_enum_with_description_buf).unwrap();
+
     let simple_enum_create_table = simple_enum::create_table_statement().unwrap();
     let simple_enum_insert = simple_enum::insert_statement(&simple_enum_json).unwrap();
 
     let string_enum_create_table = string_enum::create_table_statement().unwrap();
     let string_enum_insert = string_enum::insert_statement(&string_enum_json).unwrap();
 
+    let simple_enum_with_description_create_table =
+        simple_enum_with_description::create_table_statement().unwrap();
+    let simple_enum_with_description_insert =
+        simple_enum_with_description::insert_statement(&simple_enum_with_description_json).unwrap();
+
+    let string_enum_with_description_create_table =
+        string_enum_with_description::create_table_statement().unwrap();
+    let string_enum_with_description_insert =
+        string_enum_with_description::insert_statement(&string_enum_with_description_json).unwrap();
+
     let sql = get_sql(&[
         &simple_enum_create_table,
         &simple_enum_insert,
         &string_enum_create_table,
         &string_enum_insert,
+        &simple_enum_with_description_create_table,
+        &simple_enum_with_description_insert,
+        &string_enum_with_description_create_table,
+        &string_enum_with_description_insert,
     ]);
-
     std::fs::write("../init.sql", sql).expect("Unable to write to file.");
 }

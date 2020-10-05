@@ -1,0 +1,12 @@
+[
+  {
+    "name": "test1",
+    "stringId": "test1Id",
+    "description": "test1description"
+  },
+  {
+    "name": "test2",
+    "stringId": "test2Id",
+    "description": "test2description"
+  }
+]
