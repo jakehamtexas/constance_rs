@@ -19,7 +19,7 @@ docker cp init.sql mssql:/init.sql
 docker exec mssql sh -c "/opt/mssql-tools/bin/sqlcmd -H $host -U $user -P $pw -i ./init.sql"
 
 # Run the tests!
-PORT=$port HOST=$host PASSWORD=$pw USER=$user cargo test table_to_constants_mssql_simple_enum -- --ignored
+PORT=$port HOST=$host PASSWORD=$pw USER=$user cargo test table_to_constants -- --ignored
 
 # Teardown
 rm init.sql

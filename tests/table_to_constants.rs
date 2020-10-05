@@ -36,5 +36,40 @@ pub async fn table_to_constants_mssql_simple_enum() {
                 .into_iter()
                 .all(|(k, v)| expected.contains_key(&k) && *expected.get(&k).unwrap() == v);
         assert!(has_deep_equality);
-    };
+    } else {
+        assert!(false);
+    }
+}
+
+#[tokio::test]
+#[ignore = "requires test script for setup/teardown"]
+pub async fn table_to_constants_mssql_string_enum() {
+    // arrange
+    let connection_options = get_connection_options_from_env();
+    let rc = mssql::get_string_enum_rc(connection_options);
+    let db = get_database(&rc);
+    let table_options = &rc.table_options;
+    let mut expected: HashMap<String, String> = HashMap::new();
+    expected.insert("test1".to_string(), "test1Id".to_string());
+    expected.insert("test2".to_string(), "test2Id".to_string());
+
+    // act
+    let table_constants = get_table_constants(db, table_options).await;
+
+    let table_constant = table_constants.first().unwrap();
+
+    // assert
+    if let TableConstant::StringEnum(actual) = table_constant {
+        println!("Actual: {:?}", actual.map);
+        println!("Expected: {:?}", expected);
+        let has_deep_equality = actual.map.len() == expected.len()
+            && actual
+                .map
+                .clone()
+                .into_iter()
+                .all(|(k, v)| expected.contains_key(&k) && *expected.get(&k).unwrap() == v);
+        assert!(has_deep_equality);
+    } else {
+        assert!(false);
+    }
 }

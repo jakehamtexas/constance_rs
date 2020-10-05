@@ -1,23 +1,46 @@
 use constance::{
     testing_only::{
         Column, Connection, ConnectionOptions, ConstanceRc, QueryExecutionOptions, TableIdentifier,
-        TableOption, MSSQL, NUMBER_TYPE,
+        TableOption, MSSQL, NUMBER_TYPE, STRING_TYPE,
     },
     types::OutputOptions,
 };
 
 pub fn get_simple_enum_rc(options: ConnectionOptions) -> ConstanceRc {
-    let identifier = get_identifier("simple_enum");
+    let table_options = get_table_options(
+        "simple_enum",
+        "name".to_string(),
+        Column {
+            name: "id".to_string(),
+            data_type: NUMBER_TYPE.to_string(),
+        },
+    );
+    let base_rc = get_base_rc(options);
     ConstanceRc {
-        table_options: vec![TableOption {
-            identifier,
-            key_column_name: "name".to_string(),
-            value_columns: vec![Column {
-                name: "id".to_string(),
-                data_type: NUMBER_TYPE.to_string(),
-            }],
-            description_column_name: None,
-        }],
+        table_options,
+        ..base_rc
+    }
+}
+
+pub fn get_string_enum_rc(options: ConnectionOptions) -> ConstanceRc {
+    let table_options = get_table_options(
+        "string_enum",
+        "name".to_string(),
+        Column {
+            name: "string_id".to_string(),
+            data_type: STRING_TYPE.to_string(),
+        },
+    );
+    let base_rc = get_base_rc(options);
+    ConstanceRc {
+        table_options,
+        ..base_rc
+    }
+}
+
+fn get_base_rc(options: ConnectionOptions) -> ConstanceRc {
+    ConstanceRc {
+        table_options: vec![],
         output_options: Some(OutputOptions::default()),
         query_execution_options: QueryExecutionOptions {
             connection: Connection {
@@ -37,4 +60,18 @@ fn get_identifier(table_name: &str) -> TableIdentifier {
         schema_name: "dbo".to_string(),
         object_name: table_name.to_string(),
     }
+}
+
+fn get_table_options(
+    table_name: &str,
+    key_column_name: String,
+    value_column: Column,
+) -> Vec<TableOption> {
+    let identifier = get_identifier(table_name);
+    vec![TableOption {
+        identifier,
+        key_column_name,
+        value_columns: vec![value_column],
+        description_column_name: None,
+    }]
 }

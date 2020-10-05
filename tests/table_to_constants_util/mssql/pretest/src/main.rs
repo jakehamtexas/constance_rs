@@ -73,6 +73,6 @@ fn main() {
         &string_enum_create_table,
         &string_enum_insert,
     ]);
-    println!("{}", sql);
+
     std::fs::write("../init.sql", sql).expect("Unable to write to file.");
 }
