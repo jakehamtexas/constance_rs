@@ -14,6 +14,7 @@ pub fn get_simple_enum_rc(options: ConnectionOptions) -> ConstanceRc {
             name: "id".to_string(),
             data_type: NUMBER_TYPE.to_string(),
         },
+        None,
     );
     let base_rc = get_base_rc(options);
     ConstanceRc {
@@ -30,6 +31,7 @@ pub fn get_string_enum_rc(options: ConnectionOptions) -> ConstanceRc {
             name: "string_id".to_string(),
             data_type: STRING_TYPE.to_string(),
         },
+        None,
     );
     let base_rc = get_base_rc(options);
     ConstanceRc {
@@ -66,12 +68,47 @@ fn get_table_options(
     table_name: &str,
     key_column_name: String,
     value_column: Column,
+    description_column_name: Option<String>,
 ) -> Vec<TableOption> {
     let identifier = get_identifier(table_name);
     vec![TableOption {
         identifier,
         key_column_name,
         value_columns: vec![value_column],
-        description_column_name: None,
+        description_column_name,
     }]
+}
+
+pub fn get_simple_enum_with_description_rc(options: ConnectionOptions) -> ConstanceRc {
+    let table_options = get_table_options(
+        "simple_enum_with_description",
+        "name".to_string(),
+        Column {
+            name: "id".to_string(),
+            data_type: NUMBER_TYPE.to_string(),
+        },
+        Some("description".to_string()),
+    );
+    let base_rc = get_base_rc(options);
+    ConstanceRc {
+        table_options,
+        ..base_rc
+    }
+}
+
+pub fn get_string_enum_with_description_rc(options: ConnectionOptions) -> ConstanceRc {
+    let table_options = get_table_options(
+        "string_enum_with_description",
+        "name".to_string(),
+        Column {
+            name: "string_id".to_string(),
+            data_type: STRING_TYPE.to_string(),
+        },
+        Some("description".to_string()),
+    );
+    let base_rc = get_base_rc(options);
+    ConstanceRc {
+        table_options,
+        ..base_rc
+    }
 }

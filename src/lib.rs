@@ -31,6 +31,6 @@ pub mod testing_only {
     pub use super::constancerc::get_runtime_configuration::abstraction::{
         i_cli_args::ICliArgs, i_file_system::IFileSystem, i_rc_parser::IRcParser,
     };
-    pub use super::reader::rdbms::MSSQL;
+    pub use super::reader::{rdbms::MSSQL, value_with_description::ValueWithDescription};
     pub use super::table_to_constants::table_constant::TableConstant;
 }
