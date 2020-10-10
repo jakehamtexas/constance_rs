@@ -1,7 +1,7 @@
 use super::{column::Column, table_identifier::TableIdentifier};
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct TableOption {
     pub identifier: TableIdentifier,

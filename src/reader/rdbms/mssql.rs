@@ -131,7 +131,7 @@ impl ReadDb for Mssql {
 
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_column::<&str>(row, key_column_name); //get_key_column(row, &ColumnType::String, key_column_name);
+                let key_column = get_column::<&str>(row, key_column_name);
                 let value_column = get_column_of_unknown_type(row, value_column);
                 if let (Some(key), Some(value)) = (key_column, value_column) {
                     map.insert(key, value);
@@ -160,7 +160,7 @@ impl ReadDb for Mssql {
 
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_column::<&str>(row, &key_column_name); // get_column_of_unknown_type(row, &key_column_type, key_column_name);
+                let key_column = get_column::<&str>(row, &key_column_name);
                 let value_column = get_column_of_unknown_type(row, &value_column);
                 let description =
                     get_column::<&str>(row, description_column_name).unwrap_or_default();
