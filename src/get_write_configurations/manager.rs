@@ -1,4 +1,7 @@
-use crate::{constancerc::dto::language::Language, types::OutputOptions};
+use crate::{
+    constancerc::dto::language::Language, constancerc::dto::output_options::DEFAULT_PATH,
+    types::OutputOptions,
+};
 
 use super::write_configuration::WriteConfiguration;
 use super::{
