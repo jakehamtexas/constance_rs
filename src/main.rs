@@ -1,6 +1,7 @@
 use constance::{
     functions::{
-        get_database, get_runtime_configuration, get_table_constants, write_files_for_targets,
+        get_database, get_runtime_configuration, get_table_constants, get_write_configurations,
+        write_all,
     },
     types::{CliArgs, FileSystem, OutputOptions, RcParser},
 };
@@ -18,5 +19,6 @@ async fn main() {
     let table_constants = get_table_constants(db, table_options).await;
 
     let output_options = &rc.output_options.unwrap_or_else(OutputOptions::default);
-    write_files_for_targets(&table_constants, &output_options);
+    let write_configurations = get_write_configurations(&table_constants, &output_options);
+    write_all(&write_configurations, &output_options);
 }

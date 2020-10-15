@@ -21,16 +21,13 @@ impl Language {
         };
         val.to_owned()
     }
-    // TODO: Reimplement this by uncommenting this
-    // TODO: function when it is necessary. It's commented
-    // TODO: now to appease clippy.
 
-    // pub fn from_string(from: &str) -> Self {
-    //     match from {
-    //         "typescript" => Language::Typescript,
-    //         "rust" => Language::Rust,
-    //         "dotnet" => Language::Dotnet,
-    //         _ => panic!("Unimplemented language found in runtime configuration!"),
-    //     }
-    // }
+    pub fn from_string(from: &str) -> Self {
+        match from {
+            "typescript" => Language::Typescript,
+            "rust" => Language::Rust,
+            "dotnet" => Language::Dotnet,
+            _ => panic!("Unimplemented language found in runtime configuration!"),
+        }
+    }
 }

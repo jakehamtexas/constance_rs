@@ -1,13 +1,14 @@
 mod constancerc;
+mod get_write_configurations;
 mod reader;
 mod table_to_constants;
-mod write_files_for_targets;
-
+mod write_all;
 pub mod functions {
     pub use super::constancerc::get_runtime_configuration::get_runtime_configuration;
+    pub use super::get_write_configurations::manager::get_write_configurations;
     pub use super::reader::manager::get_database;
     pub use super::table_to_constants::manager::get_table_constants;
-    pub use super::write_files_for_targets::manager::write_files_for_targets;
+    pub use super::write_all::manager::write_all;
 }
 
 pub mod types {
