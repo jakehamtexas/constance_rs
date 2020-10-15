@@ -1,5 +1,5 @@
 use serde::Deserialize;
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct TableIdentifier {
     pub database_name: String,

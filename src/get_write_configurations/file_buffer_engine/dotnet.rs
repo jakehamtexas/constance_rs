@@ -1,6 +1,7 @@
 use std::path::Path;
 
 use crate::{
+    get_write_configurations::casing_engine,
     table_to_constants::table_constant::object_like::ObjectLike,
     table_to_constants::table_constant::object_like_with_description::ObjectLikeWithDescription,
     table_to_constants::table_constant::simple_enum::SimpleEnum,
@@ -17,7 +18,7 @@ pub struct Dotnet {}
 
 fn get_before(name: &str) -> String {
     let namespace_statement = "namespace Constant";
-    let name = format!("enum {}", name);
+    let name = format!("enum {}", casing_engine::pascal_case(name));
     [
         namespace_statement,
         NEWLINE,
@@ -25,6 +26,9 @@ fn get_before(name: &str) -> String {
         NEWLINE,
         FOUR_SPACE_TAB,
         &name,
+        NEWLINE,
+        FOUR_SPACE_TAB,
+        OPEN_BRACE,
         NEWLINE,
         FOUR_SPACE_TAB,
         FOUR_SPACE_TAB,
@@ -50,7 +54,7 @@ impl FileBufferEngine for Dotnet {
         let members = constant
             .map
             .iter()
-            .map(|(key, value)| format!("{} = {}", key, value))
+            .map(|(key, value)| format!("{} = {}", casing_engine::pascal_case(key), value))
             .collect::<Vec<String>>()
             .join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str());
         let after = get_after();

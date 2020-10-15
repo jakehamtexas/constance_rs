@@ -4,7 +4,7 @@ use crate::{
 };
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SimpleEnum {
     pub map: HashMap<String, String>,
     pub identifier: TableIdentifier,

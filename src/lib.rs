@@ -24,6 +24,7 @@ pub mod testing_only {
         column_type::{NUMBER_TYPE, STRING_TYPE},
         connection::Connection,
         connection_options::ConnectionOptions,
+        language::Language,
         query_execution_options::QueryExecutionOptions,
         table_identifier::TableIdentifier,
         table_option::TableOption,
@@ -33,5 +34,5 @@ pub mod testing_only {
         i_cli_args::ICliArgs, i_file_system::IFileSystem, i_rc_parser::IRcParser,
     };
     pub use super::reader::{rdbms::MSSQL, value_with_description::ValueWithDescription};
-    pub use super::table_to_constants::table_constant::TableConstant;
+    pub use super::table_to_constants::table_constant::{simple_enum::SimpleEnum, TableConstant};
 }

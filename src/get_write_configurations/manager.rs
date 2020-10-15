@@ -1,7 +1,4 @@
-use crate::{
-    constancerc::dto::language::Language, constancerc::dto::output_options::DEFAULT_PATH,
-    types::OutputOptions,
-};
+use crate::{constancerc::dto::language::Language, types::OutputOptions};
 
 use super::write_configuration::WriteConfiguration;
 use super::{
@@ -129,8 +126,12 @@ fn get_filename(engine_type: &FileBufferEngineType, constant: &TableConstant) ->
     let name = [identifier.database_name, identifier.object_name].join("_");
 
     match engine_type {
-        FileBufferEngineType::Typesript(_) => casing_engine::pascal_case(&name),
-        FileBufferEngineType::Dotnet(_) => casing_engine::pascal_case(&name),
-        FileBufferEngineType::Rust(_) => casing_engine::snake_case(&name),
+        FileBufferEngineType::Typesript(_) => {
+            format!("{}{}", casing_engine::pascal_case(&name), ".ts")
+        }
+        FileBufferEngineType::Dotnet(_) => {
+            format!("{}{}", casing_engine::pascal_case(&name), ".cs")
+        }
+        FileBufferEngineType::Rust(_) => format!("{}{}", casing_engine::snake_case(&name), ".rs"),
     }
 }
