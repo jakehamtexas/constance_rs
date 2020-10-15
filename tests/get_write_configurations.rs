@@ -3,6 +3,8 @@ use get_write_configurations_util::{
     dotnet_simple_enum_buffer::DOTNET_SIMPLE_ENUM_BUFFER1,
     dotnet_simple_enum_buffer::DOTNET_SIMPLE_ENUM_BUFFER2, get_output_options_for_filename_test,
     get_table_constants_for_filename_test, get_table_constants_for_simple_enum_buffer_test,
+    typescript_simple_enum_buffer::TYPESCRIPT_SIMPLE_ENUM_BUFFER1,
+    typescript_simple_enum_buffer::TYPESCRIPT_SIMPLE_ENUM_BUFFER2,
 };
 mod get_write_configurations_util;
 
@@ -29,10 +31,10 @@ pub fn dotnet_filename() {
 //     do_filename_test(Language::Rust, "test_enum.rs");
 // }
 
-// #[test]
-// pub fn typescript_filename() {
-//     do_filename_test(Language::Dotnet, "TestEnum.ts");
-// }
+#[test]
+pub fn typescript_filename() {
+    do_filename_test(Language::Typescript, "TestEnum.ts");
+}
 
 fn do_simple_enum_buffer_test(lang: Language, expecteds: &[&str]) {
     // arrange
@@ -63,13 +65,13 @@ pub fn dotnet_simple_enum_buffer() {
 //     );
 // }
 
-// #[test]
-// pub fn typescript_simple_enum_buffer() {
-//     do_simple_enum_buffer_test(
-//         Language::Typescript,
-//         &[
-//             TYPESCRIPT_SIMPLE_ENUM_BUFFER1,
-//             TYPESCRIPT_SIMPLE_ENUM_BUFFER2,
-//         ],
-//     );
-// }
+#[test]
+pub fn typescript_simple_enum_buffer() {
+    do_simple_enum_buffer_test(
+        Language::Typescript,
+        &[
+            TYPESCRIPT_SIMPLE_ENUM_BUFFER1,
+            TYPESCRIPT_SIMPLE_ENUM_BUFFER2,
+        ],
+    );
+}

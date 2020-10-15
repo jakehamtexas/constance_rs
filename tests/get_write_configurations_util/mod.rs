@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 pub mod dotnet_simple_enum_buffer;
+pub mod typescript_simple_enum_buffer;
 
 use constance::{
     testing_only::{Language, SimpleEnum, TableConstant, TableIdentifier},
