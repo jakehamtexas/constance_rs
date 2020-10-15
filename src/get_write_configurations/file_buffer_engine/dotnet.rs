@@ -11,8 +11,8 @@ use crate::{
 };
 
 use super::{
-    tokens::CLOSE_BRACE, tokens::FOUR_SPACE_TAB, tokens::NEWLINE, tokens::OPEN_BRACE,
-    FileBufferEngine,
+    tokens::CLOSE_BRACE, tokens::COMMA, tokens::FOUR_SPACE_TAB, tokens::NEWLINE,
+    tokens::OPEN_BRACE, FileBufferEngine,
 };
 pub struct Dotnet {}
 
@@ -56,7 +56,11 @@ impl FileBufferEngine for Dotnet {
             .iter()
             .map(|(key, value)| format!("{} = {}", casing_engine::pascal_case(key), value))
             .collect::<Vec<String>>()
-            .join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str());
+            .join(
+                [COMMA, NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
+                    .join("")
+                    .as_str(),
+            );
         let after = get_after();
         [before, members, after].join("")
     }

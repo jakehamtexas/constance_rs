@@ -17,7 +17,7 @@ fn get_after(name: &str) -> String {
 }
 use super::{
     tokens::CLOSE_BRACE, tokens::FOUR_SPACE_TAB, tokens::NEWLINE, tokens::OPEN_BRACE,
-    tokens::SPACE, FileBufferEngine,
+    tokens::SEMICOLON, tokens::SPACE, FileBufferEngine,
 };
 pub struct Typescript {}
 
@@ -28,9 +28,15 @@ impl FileBufferEngine for Typescript {
             .iter()
             .map(|(key, value)| format!("{} = {}", casing_engine::pascal_case(key), value))
             .collect::<Vec<String>>()
-            .join([NEWLINE, FOUR_SPACE_TAB].join("").as_str());
+            .join([SEMICOLON, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
         let name = casing_engine::pascal_case(&constant.identifier.object_name);
-        [get_before(&name), members, get_after(&name)].join("")
+        [
+            get_before(&name),
+            members,
+            SEMICOLON.to_string(),
+            get_after(&name),
+        ]
+        .join("")
     }
 
     fn simple_enum_with_description(&self, _constant: &SimpleEnumWithDescription) -> String {
