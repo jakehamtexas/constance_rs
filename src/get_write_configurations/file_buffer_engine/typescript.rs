@@ -10,8 +10,6 @@ use crate::{
 };
 
 static API_COMMENT_STAR: &str = "*";
-static COMMENT_START: &str = "/**";
-static COMMENT_END: &str = "*/";
 
 fn get_name(identifier: &TableIdentifier) -> String {
     casing_engine::pascal_case(&identifier.object_name)
@@ -25,8 +23,8 @@ fn get_after(identifier: &TableIdentifier) -> String {
     [NEWLINE, CLOSE_BRACE, NEWLINE, NEWLINE, &export].join("")
 }
 use super::{
-    tokens::CLOSE_BRACE, tokens::COMMA, tokens::FOUR_SPACE_TAB, tokens::NEWLINE,
-    tokens::OPEN_BRACE, tokens::SPACE, FileBufferEngine,
+    tokens::CLOSE_BRACE, tokens::COMMA, tokens::COMMENT_END, tokens::COMMENT_START,
+    tokens::FOUR_SPACE_TAB, tokens::NEWLINE, tokens::OPEN_BRACE, tokens::SPACE, FileBufferEngine,
 };
 pub struct Typescript {}
 

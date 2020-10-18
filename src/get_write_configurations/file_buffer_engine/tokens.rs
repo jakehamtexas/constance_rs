@@ -4,4 +4,5 @@ pub static OPEN_BRACE: &str = "{";
 pub static CLOSE_BRACE: &str = "}";
 pub static SPACE: &str = " ";
 pub static COMMA: &str = ",";
-pub static SEMICOLON: &str = ";";
+pub static COMMENT_START: &str = "/**";
+pub static COMMENT_END: &str = "*/";

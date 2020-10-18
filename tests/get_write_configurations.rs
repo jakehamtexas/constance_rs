@@ -12,6 +12,8 @@ use get_write_configurations_util::{
     get_table_constants_for_simple_enum_with_description_buffer_test,
     rust_simple_enum_buffer::RUST_SIMPLE_ENUM_BUFFER1,
     rust_simple_enum_buffer::RUST_SIMPLE_ENUM_BUFFER2,
+    rust_simple_enum_with_description_buffer::RUST_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1,
+    rust_simple_enum_with_description_buffer::RUST_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER2,
     typescript_simple_enum_buffer::TYPESCRIPT_SIMPLE_ENUM_BUFFER1,
     typescript_simple_enum_buffer::TYPESCRIPT_SIMPLE_ENUM_BUFFER2,
     typescript_simple_enum_with_description_buffer::TYPESCRIPT_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1,
@@ -110,6 +112,17 @@ pub fn dotnet_simple_enum_with_description_buffer() {
         &[
             DOTNET_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1,
             DOTNET_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER2,
+        ],
+    )
+}
+
+#[test]
+pub fn rust_simple_enum_with_description_buffer() {
+    do_simple_enum_with_description_buffer_test(
+        Language::Rust,
+        &[
+            RUST_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1,
+            RUST_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER2,
         ],
     )
 }
