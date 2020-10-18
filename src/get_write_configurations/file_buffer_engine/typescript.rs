@@ -25,9 +25,8 @@ fn get_after(identifier: &TableIdentifier) -> String {
     [NEWLINE, CLOSE_BRACE, NEWLINE, NEWLINE, &export].join("")
 }
 use super::{
-    tokens::CLOSE_BRACE, tokens::COMMA, tokens::COMMENT_END, tokens::COMMENT_START,
-    tokens::FOUR_SPACE_TAB, tokens::NEWLINE, tokens::OPEN_BRACE, tokens::QUOTATION_MARK,
-    tokens::SPACE, FileBufferEngine,
+    get_value, tokens::CLOSE_BRACE, tokens::COMMA, tokens::COMMENT_END, tokens::COMMENT_START,
+    tokens::FOUR_SPACE_TAB, tokens::NEWLINE, tokens::OPEN_BRACE, tokens::SPACE, FileBufferEngine,
 };
 pub struct Typescript {}
 
@@ -39,12 +38,11 @@ fn primitive_enum(
     let members = map
         .iter()
         .map(|(key, value)| {
-            let value = if quotes {
-                [QUOTATION_MARK, value, QUOTATION_MARK].join("")
-            } else {
-                value.to_string()
-            };
-            format!("{} = {}", casing_engine::pascal_case(key), value)
+            format!(
+                "{} = {}",
+                casing_engine::pascal_case(key),
+                get_value(value, quotes)
+            )
         })
         .collect::<Vec<String>>()
         .join([COMMA, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
@@ -68,12 +66,11 @@ fn primitive_enum_with_description(
         .map(|(key, ValueWithDescription { value, description })| {
             let comment_description = ["", API_COMMENT_STAR, description].join(" ");
             let comment_end = ["", COMMENT_END].join(" ");
-            let value = if quotes {
-                [QUOTATION_MARK, value, QUOTATION_MARK].join("")
-            } else {
-                value.to_owned()
-            };
-            let member = format!("{} = {}", casing_engine::pascal_case(key), value);
+            let member = format!(
+                "{} = {}",
+                casing_engine::pascal_case(key),
+                get_value(value, quotes)
+            );
             [
                 COMMENT_START.to_owned(),
                 comment_description,

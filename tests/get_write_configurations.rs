@@ -16,6 +16,10 @@ use get_write_configurations_util::{
     rust_simple_enum_buffer::RUST_SIMPLE_ENUM_BUFFER2,
     rust_simple_enum_with_description_buffer::RUST_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1,
     rust_simple_enum_with_description_buffer::RUST_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER2,
+    rust_string_enum_buffer::RUST_STRING_ENUM_BUFFER1,
+    rust_string_enum_buffer::RUST_STRING_ENUM_BUFFER2,
+    rust_string_enum_with_description_buffer::RUST_STRING_ENUM_WITH_DESCRIPTION_BUFFER1,
+    rust_string_enum_with_description_buffer::RUST_STRING_ENUM_WITH_DESCRIPTION_BUFFER2,
     typescript_simple_enum_buffer::TYPESCRIPT_SIMPLE_ENUM_BUFFER1,
     typescript_simple_enum_buffer::TYPESCRIPT_SIMPLE_ENUM_BUFFER2,
     typescript_simple_enum_with_description_buffer::TYPESCRIPT_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1,
@@ -154,6 +158,14 @@ fn do_string_enum_buffer_test(lang: Language, expecteds: &[&str]) {
 }
 
 #[test]
+pub fn rust_string_enum_buffer() {
+    do_string_enum_buffer_test(
+        Language::Rust,
+        &[RUST_STRING_ENUM_BUFFER1, RUST_STRING_ENUM_BUFFER2],
+    )
+}
+
+#[test]
 pub fn typescript_string_enum_buffer() {
     do_string_enum_buffer_test(
         Language::Typescript,
@@ -170,6 +182,17 @@ fn do_string_enum_with_description_buffer_test(lang: Language, expecteds: &[&str
     let output_options = get_output_options_for_filename_test(lang);
 
     do_buffer_assertion(&table_constants, &output_options, expecteds);
+}
+
+#[test]
+pub fn rust_string_enum_with_description_buffer() {
+    do_string_enum_with_description_buffer_test(
+        Language::Rust,
+        &[
+            RUST_STRING_ENUM_WITH_DESCRIPTION_BUFFER1,
+            RUST_STRING_ENUM_WITH_DESCRIPTION_BUFFER2,
+        ],
+    )
 }
 
 #[test]

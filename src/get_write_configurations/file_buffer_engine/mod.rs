@@ -12,6 +12,8 @@ use crate::{
     table_to_constants::table_constant::string_enum_with_description::StringEnumWithDescription,
 };
 
+use self::tokens::QUOTATION_MARK;
+
 pub trait FileBufferEngine {
     fn simple_enum(&self, _constant: &SimpleEnum) -> String;
     fn simple_enum_with_description(&self, _constant: &SimpleEnumWithDescription) -> String;
@@ -25,4 +27,12 @@ pub enum FileBufferEngineType {
     Typesript(typescript::Typescript),
     Dotnet(dotnet::Dotnet),
     Rust(rust::Rust),
+}
+
+pub fn get_value(value: &str, quotes: bool) -> String {
+    if quotes {
+        [QUOTATION_MARK, value, QUOTATION_MARK].join("")
+    } else {
+        value.to_string()
+    }
 }

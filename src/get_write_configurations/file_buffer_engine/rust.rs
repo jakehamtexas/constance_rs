@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{
     get_write_configurations::casing_engine,
     table_to_constants::table_constant::object_like::ObjectLike,
@@ -10,7 +12,7 @@ use crate::{
 };
 
 use super::{
-    tokens::CLOSE_BRACE, tokens::COMMA, tokens::COMMENT_END, tokens::COMMENT_START,
+    get_value, tokens::CLOSE_BRACE, tokens::COMMA, tokens::COMMENT_END, tokens::COMMENT_START,
     tokens::FOUR_SPACE_TAB, tokens::NEWLINE, tokens::OPEN_BRACE, tokens::SPACE, FileBufferEngine,
 };
 
@@ -28,45 +30,69 @@ fn get_after() -> String {
 
 pub struct Rust {}
 
+fn primitive_enum(
+    map: &HashMap<String, String>,
+    identifier: &TableIdentifier,
+    quotes: bool,
+) -> String {
+    let members = map
+        .iter()
+        .map(|(key, value)| {
+            format!(
+                "{} = {}",
+                casing_engine::pascal_case(key),
+                get_value(value, quotes)
+            )
+        })
+        .collect::<Vec<String>>()
+        .join([COMMA, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
+    [
+        get_before(identifier),
+        members,
+        COMMA.to_string(),
+        get_after(),
+    ]
+    .join("")
+}
+
+fn primitive_enum_with_description(
+    map: &HashMap<String, ValueWithDescription>,
+    identifier: &TableIdentifier,
+    quotes: bool,
+) -> String {
+    let before = get_before(identifier);
+    let members = map
+        .iter()
+        .map(|(key, ValueWithDescription { value, description })| {
+            let comment = [COMMENT_START, description, COMMENT_END].join(" ");
+            let member = format!(
+                "{} = {}",
+                casing_engine::pascal_case(key),
+                get_value(value, quotes)
+            );
+            [comment, member].join(&format!("{}{}", NEWLINE, FOUR_SPACE_TAB))
+        })
+        .collect::<Vec<String>>()
+        .join([COMMA, NEWLINE, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
+    let after = get_after();
+    [before, members, COMMA.to_owned(), after].join("")
+}
+
 impl FileBufferEngine for Rust {
     fn simple_enum(&self, constant: &SimpleEnum) -> String {
-        let members = constant
-            .map
-            .iter()
-            .map(|(key, value)| format!("{} = {}", casing_engine::pascal_case(key), value))
-            .collect::<Vec<String>>()
-            .join([COMMA, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
-        [
-            get_before(&constant.identifier),
-            members,
-            COMMA.to_string(),
-            get_after(),
-        ]
-        .join("")
+        primitive_enum(&constant.map, &constant.identifier, false)
     }
 
     fn simple_enum_with_description(&self, constant: &SimpleEnumWithDescription) -> String {
-        let before = get_before(&constant.identifier);
-        let members = constant
-            .map
-            .iter()
-            .map(|(key, ValueWithDescription { value, description })| {
-                let comment = [COMMENT_START, description, COMMENT_END].join(" ");
-                let member = format!("{} = {}", casing_engine::pascal_case(key), value);
-                [comment, member].join(&format!("{}{}", NEWLINE, FOUR_SPACE_TAB))
-            })
-            .collect::<Vec<String>>()
-            .join([COMMA, NEWLINE, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
-        let after = get_after();
-        [before, members, COMMA.to_owned(), after].join("")
+        primitive_enum_with_description(&constant.map, &constant.identifier, false)
     }
 
-    fn string_enum(&self, _constant: &StringEnum) -> String {
-        todo!()
+    fn string_enum(&self, constant: &StringEnum) -> String {
+        primitive_enum(&constant.map, &constant.identifier, true)
     }
 
-    fn string_enum_with_description(&self, _constant: &StringEnumWithDescription) -> String {
-        todo!()
+    fn string_enum_with_description(&self, constant: &StringEnumWithDescription) -> String {
+        primitive_enum_with_description(&constant.map, &constant.identifier, true)
     }
 
     fn object_like(&self, _constant: &ObjectLike) -> String {

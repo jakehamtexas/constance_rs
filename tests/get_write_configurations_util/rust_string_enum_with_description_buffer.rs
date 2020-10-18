@@ -1,0 +1,2 @@
+pub static RUST_STRING_ENUM_WITH_DESCRIPTION_BUFFER1: &str = "pub enum TestEnum {\r\n    /** description5 */\r\n    Test1 = \"test1\",\r\n\r\n    /** description7 */\r\n    Test2 = \"test2\",\r\n}\r\n";
+pub static RUST_STRING_ENUM_WITH_DESCRIPTION_BUFFER2: &str = "pub enum TestEnum {\r\n    /** description7 */\r\n    Test2 = \"test2\",\r\n\r\n    /** description5 */\r\n    Test1 = \"test1\",\r\n}\r\n";
