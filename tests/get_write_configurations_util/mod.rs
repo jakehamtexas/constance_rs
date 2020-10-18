@@ -5,11 +5,13 @@ pub mod rust_simple_enum_buffer;
 pub mod rust_simple_enum_with_description_buffer;
 pub mod typescript_simple_enum_buffer;
 pub mod typescript_simple_enum_with_description_buffer;
+pub mod typescript_string_enum_buffer;
+pub mod typescript_string_enum_with_description_buffer;
 
 use constance::{
     testing_only::{
-        Language, SimpleEnum, SimpleEnumWithDescription, TableConstant, TableIdentifier,
-        ValueWithDescription,
+        Language, SimpleEnum, SimpleEnumWithDescription, StringEnum, StringEnumWithDescription,
+        TableConstant, TableIdentifier, ValueWithDescription,
     },
     types::OutputOptions,
 };
@@ -37,6 +39,19 @@ pub fn get_table_constants_for_simple_enum_buffer_test() -> Vec<TableConstant> {
     })]
 }
 
+pub fn get_table_constants_for_string_enum_buffer_test() -> Vec<TableConstant> {
+    let mut map = HashMap::new();
+    map.insert("test1".to_string(), "test1".to_string());
+    map.insert("test2".to_string(), "test2".to_string());
+    vec![TableConstant::StringEnum(StringEnum {
+        identifier: TableIdentifier {
+            object_name: "test_enum".to_string(),
+            ..TableIdentifier::default()
+        },
+        map,
+    })]
+}
+
 pub fn get_table_constants_for_simple_enum_with_description_buffer_test() -> Vec<TableConstant> {
     let mut map = HashMap::new();
     map.insert(
@@ -55,6 +70,33 @@ pub fn get_table_constants_for_simple_enum_with_description_buffer_test() -> Vec
     );
     vec![TableConstant::SimpleEnumWithDescription(
         SimpleEnumWithDescription {
+            identifier: TableIdentifier {
+                object_name: "test_enum".to_string(),
+                ..TableIdentifier::default()
+            },
+            map,
+        },
+    )]
+}
+
+pub fn get_table_constants_for_string_enum_with_description_buffer_test() -> Vec<TableConstant> {
+    let mut map = HashMap::new();
+    map.insert(
+        "test1".to_string(),
+        ValueWithDescription {
+            value: "test1".to_string(),
+            description: "description5".to_string(),
+        },
+    );
+    map.insert(
+        "test2".to_string(),
+        ValueWithDescription {
+            value: "test2".to_string(),
+            description: "description7".to_string(),
+        },
+    );
+    vec![TableConstant::StringEnumWithDescription(
+        StringEnumWithDescription {
             identifier: TableIdentifier {
                 object_name: "test_enum".to_string(),
                 ..TableIdentifier::default()

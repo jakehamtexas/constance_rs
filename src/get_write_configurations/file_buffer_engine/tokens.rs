@@ -6,3 +6,4 @@ pub static SPACE: &str = " ";
 pub static COMMA: &str = ",";
 pub static COMMENT_START: &str = "/**";
 pub static COMMENT_END: &str = "*/";
+pub static QUOTATION_MARK: &str = "\"";
