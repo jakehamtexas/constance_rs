@@ -34,5 +34,8 @@ pub mod testing_only {
         i_cli_args::ICliArgs, i_file_system::IFileSystem, i_rc_parser::IRcParser,
     };
     pub use super::reader::{rdbms::MSSQL, value_with_description::ValueWithDescription};
-    pub use super::table_to_constants::table_constant::{simple_enum::SimpleEnum, TableConstant};
+    pub use super::table_to_constants::table_constant::{
+        simple_enum::SimpleEnum, simple_enum_with_description::SimpleEnumWithDescription,
+        TableConstant,
+    };
 }

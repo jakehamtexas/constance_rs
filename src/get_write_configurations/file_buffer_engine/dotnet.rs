@@ -8,17 +8,22 @@ use crate::{
     table_to_constants::table_constant::simple_enum_with_description::SimpleEnumWithDescription,
     table_to_constants::table_constant::string_enum::StringEnum,
     table_to_constants::table_constant::string_enum_with_description::StringEnumWithDescription,
+    testing_only::ValueWithDescription,
 };
 
 use super::{
     tokens::CLOSE_BRACE, tokens::COMMA, tokens::FOUR_SPACE_TAB, tokens::NEWLINE,
     tokens::OPEN_BRACE, FileBufferEngine,
 };
+
+static API_COMMENT_SLASHES: &str = "///";
+static SUMMARY_XML_OPEN: &str = "<summary>";
+static SUMMARY_XML_CLOSE: &str = "</summary>";
 pub struct Dotnet {}
 
 fn get_before(name: &str) -> String {
     let namespace_statement = "namespace Constant";
-    let name = format!("enum {}", casing_engine::pascal_case(name));
+    let name = format!("public enum {}", casing_engine::pascal_case(name));
     [
         namespace_statement,
         NEWLINE,
@@ -65,8 +70,28 @@ impl FileBufferEngine for Dotnet {
         [before, members, after].join("")
     }
 
-    fn simple_enum_with_description(&self, _constant: &SimpleEnumWithDescription) -> String {
-        todo!()
+    fn simple_enum_with_description(&self, constant: &SimpleEnumWithDescription) -> String {
+        let before = get_before(&constant.identifier.object_name);
+        let members = constant
+            .map
+            .iter()
+            .map(|(key, ValueWithDescription { value, description })| {
+                let comment_start = [API_COMMENT_SLASHES, SUMMARY_XML_OPEN].join(" ");
+                let comment_description = [API_COMMENT_SLASHES, description].join(" ");
+                let comment_end = [API_COMMENT_SLASHES, SUMMARY_XML_CLOSE].join(" ");
+
+                let member = format!("{} = {}", casing_engine::pascal_case(key), value);
+                [comment_start, comment_description, comment_end, member]
+                    .join(&format!("{}{}{}", NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB))
+            })
+            .collect::<Vec<String>>()
+            .join(
+                [COMMA, NEWLINE, NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
+                    .join("")
+                    .as_str(),
+            );
+        let after = get_after();
+        [before, members, after].join("")
     }
 
     fn string_enum(&self, _constant: &StringEnum) -> String {

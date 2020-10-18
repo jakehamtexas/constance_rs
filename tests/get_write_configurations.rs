@@ -1,8 +1,15 @@
-use constance::{functions::get_write_configurations, testing_only::Language};
+use constance::{
+    functions::get_write_configurations, testing_only::Language, testing_only::TableConstant,
+    types::OutputOptions,
+};
 use get_write_configurations_util::{
     dotnet_simple_enum_buffer::DOTNET_SIMPLE_ENUM_BUFFER1,
-    dotnet_simple_enum_buffer::DOTNET_SIMPLE_ENUM_BUFFER2, get_output_options_for_filename_test,
-    get_table_constants_for_filename_test, get_table_constants_for_simple_enum_buffer_test,
+    dotnet_simple_enum_buffer::DOTNET_SIMPLE_ENUM_BUFFER2,
+    dotnet_simple_enum_with_description_buffer::DOTNET_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1,
+    dotnet_simple_enum_with_description_buffer::DOTNET_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER2,
+    get_output_options_for_filename_test, get_table_constants_for_filename_test,
+    get_table_constants_for_simple_enum_buffer_test,
+    get_table_constants_for_simple_enum_with_description_buffer_test,
     rust_simple_enum_buffer::RUST_SIMPLE_ENUM_BUFFER1,
     rust_simple_enum_buffer::RUST_SIMPLE_ENUM_BUFFER2,
     typescript_simple_enum_buffer::TYPESCRIPT_SIMPLE_ENUM_BUFFER1,
@@ -38,18 +45,26 @@ pub fn typescript_filename() {
     do_filename_test(Language::Typescript, "TestEnum.ts");
 }
 
-fn do_simple_enum_buffer_test(lang: Language, expecteds: &[&str]) {
-    // arrange
-    let table_constants = get_table_constants_for_simple_enum_buffer_test();
-    let output_options = get_output_options_for_filename_test(lang);
-
+fn do_buffer_assertion(
+    table_constants: &[TableConstant],
+    output_options: &OutputOptions,
+    expecteds: &[&str],
+) {
     // act
-    let configurations = get_write_configurations(&table_constants, &output_options);
+    let configurations = get_write_configurations(table_constants, output_options);
     let first = configurations.first();
     let actual = &first.unwrap().buffer;
 
     // assert
     assert!(expecteds.iter().any(|expected| expected == actual));
+}
+
+fn do_simple_enum_buffer_test(lang: Language, expecteds: &[&str]) {
+    // arrange
+    let table_constants = get_table_constants_for_simple_enum_buffer_test();
+    let output_options = get_output_options_for_filename_test(lang);
+
+    do_buffer_assertion(&table_constants, &output_options, expecteds);
 }
 #[test]
 pub fn dotnet_simple_enum_buffer() {
@@ -76,4 +91,23 @@ pub fn typescript_simple_enum_buffer() {
             TYPESCRIPT_SIMPLE_ENUM_BUFFER2,
         ],
     );
+}
+
+fn do_simple_enum_with_description_buffer_test(lang: Language, expecteds: &[&str]) {
+    // arrange
+    let table_constants = get_table_constants_for_simple_enum_with_description_buffer_test();
+    let output_options = get_output_options_for_filename_test(lang);
+
+    do_buffer_assertion(&table_constants, &output_options, expecteds);
+}
+
+#[test]
+pub fn dotnet_simple_enum_with_description_buffer() {
+    do_simple_enum_with_description_buffer_test(
+        Language::Dotnet,
+        &[
+            DOTNET_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1,
+            DOTNET_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER2,
+        ],
+    )
 }
