@@ -1,0 +1,2 @@
+pub static TYPESCRIPT_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1: &str = "enum TestEnum {\r\n    /**\r\n     * description5\r\n     */\r\n    Test1 = 5,\r\n\r\n    /**\r\n     * description7\r\n     */\r\n    Test2 = 7,\r\n}\r\n\r\nexport default TestEnum";
+pub static TYPESCRIPT_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER2: &str = "enum TestEnum {\r\n    /**\r\n     * description7\r\n     */\r\n    Test2 = 7,\r\n\r\n    /**\r\n     * description5\r\n     */\r\n    Test1 = 5,\r\n}\r\n\r\nexport default TestEnum";

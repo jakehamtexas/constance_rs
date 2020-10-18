@@ -6,18 +6,27 @@ use crate::{
     table_to_constants::table_constant::simple_enum_with_description::SimpleEnumWithDescription,
     table_to_constants::table_constant::string_enum::StringEnum,
     table_to_constants::table_constant::string_enum_with_description::StringEnumWithDescription,
+    testing_only::TableIdentifier, testing_only::ValueWithDescription,
 };
-fn get_before(name: &str) -> String {
-    let name = format!("enum {}", name);
+
+static API_COMMENT_STAR: &str = "*";
+static COMMENT_START: &str = "/**";
+static COMMENT_END: &str = "*/";
+
+fn get_name(identifier: &TableIdentifier) -> String {
+    casing_engine::pascal_case(&identifier.object_name)
+}
+fn get_before(identifier: &TableIdentifier) -> String {
+    let name = format!("enum {}", get_name(identifier));
     [&name, SPACE, OPEN_BRACE, NEWLINE, FOUR_SPACE_TAB].join("")
 }
-fn get_after(name: &str) -> String {
-    let export = format!("export default {}", name);
+fn get_after(identifier: &TableIdentifier) -> String {
+    let export = format!("export default {}", get_name(identifier));
     [NEWLINE, CLOSE_BRACE, NEWLINE, NEWLINE, &export].join("")
 }
 use super::{
-    tokens::CLOSE_BRACE, tokens::FOUR_SPACE_TAB, tokens::NEWLINE, tokens::OPEN_BRACE,
-    tokens::SEMICOLON, tokens::SPACE, FileBufferEngine,
+    tokens::CLOSE_BRACE, tokens::COMMA, tokens::FOUR_SPACE_TAB, tokens::NEWLINE,
+    tokens::OPEN_BRACE, tokens::SPACE, FileBufferEngine,
 };
 pub struct Typescript {}
 
@@ -28,19 +37,38 @@ impl FileBufferEngine for Typescript {
             .iter()
             .map(|(key, value)| format!("{} = {}", casing_engine::pascal_case(key), value))
             .collect::<Vec<String>>()
-            .join([SEMICOLON, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
+            .join([COMMA, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
         let name = casing_engine::pascal_case(&constant.identifier.object_name);
         [
-            get_before(&name),
+            get_before(&constant.identifier),
             members,
-            SEMICOLON.to_string(),
-            get_after(&name),
+            COMMA.to_string(),
+            get_after(&constant.identifier),
         ]
         .join("")
     }
 
-    fn simple_enum_with_description(&self, _constant: &SimpleEnumWithDescription) -> String {
-        todo!()
+    fn simple_enum_with_description(&self, constant: &SimpleEnumWithDescription) -> String {
+        let before = get_before(&constant.identifier);
+        let members = constant
+            .map
+            .iter()
+            .map(|(key, ValueWithDescription { value, description })| {
+                let comment_description = ["", API_COMMENT_STAR, description].join(" ");
+                let comment_end = ["", COMMENT_END].join(" ");
+                let member = format!("{} = {}", casing_engine::pascal_case(key), value);
+                [
+                    COMMENT_START.to_owned(),
+                    comment_description,
+                    comment_end,
+                    member,
+                ]
+                .join(&format!("{}{}", NEWLINE, FOUR_SPACE_TAB))
+            })
+            .collect::<Vec<String>>()
+            .join([COMMA, NEWLINE, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
+        let after = get_after(&constant.identifier);
+        [before, members, COMMA.to_owned(), after].join("")
     }
 
     fn string_enum(&self, _constant: &StringEnum) -> String {
