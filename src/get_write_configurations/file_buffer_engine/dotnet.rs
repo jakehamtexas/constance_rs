@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use crate::{
     get_write_configurations::casing_engine,
     table_to_constants::table_constant::object_like::ObjectLike,
