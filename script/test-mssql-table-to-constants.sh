@@ -24,4 +24,3 @@ PORT=$port HOST=$host PASSWORD=$pw USER=$user cargo test table_to_constants -- -
 # Teardown
 rm init.sql
 docker kill mssql
-printf 'y\n' | docker system prune -a
