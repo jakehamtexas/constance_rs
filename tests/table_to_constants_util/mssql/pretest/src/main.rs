@@ -1,4 +1,6 @@
 #![feature(str_split_once)]
+use object_like::ObjectLikeEnum;
+use object_like_with_description::ObjectLikeEnumWithDescription;
 use serde::Deserialize;
 use simple_enum_with_description::SimpleEnumWithDescription;
 use std::fs::File;
@@ -8,6 +10,8 @@ use string_enum_with_description::StringEnumWithDescription;
 
 mod column;
 mod insert_utils;
+mod object_like;
+mod object_like_with_description;
 mod simple_enum;
 mod simple_enum_with_description;
 mod sql_util;
@@ -75,6 +79,14 @@ fn main() {
     let string_enum_with_description_json =
         get_json::<StringEnumWithDescription>(&string_enum_with_description_buf).unwrap();
 
+    let object_like_enum_buf = get_buf(dir_path, "object_like_enum").unwrap();
+    let object_like_enum_json = get_json::<ObjectLikeEnum>(&object_like_enum_buf).unwrap();
+
+    let object_like_enum_with_description_buf =
+        get_buf(dir_path, "object_like_enum_with_description").unwrap();
+    let object_like_enum_with_description_json =
+        get_json::<ObjectLikeEnumWithDescription>(&object_like_enum_with_description_buf).unwrap();
+
     let simple_enum_create_table = simple_enum::create_table_statement().unwrap();
     let simple_enum_insert = simple_enum::insert_statement(&simple_enum_json).unwrap();
 
@@ -91,6 +103,15 @@ fn main() {
     let string_enum_with_description_insert =
         string_enum_with_description::insert_statement(&string_enum_with_description_json).unwrap();
 
+    let object_like_enum_create_table = object_like::create_table_statement().unwrap();
+    let object_like_enum_insert = object_like::insert_statement(&object_like_enum_json).unwrap();
+
+    let object_like_enum_with_description_create_table =
+        object_like_with_description::create_table_statement().unwrap();
+    let object_like_enum_with_description_insert =
+        object_like_with_description::insert_statement(&object_like_enum_with_description_json)
+            .unwrap();
+
     let sql = get_sql(&[
         &simple_enum_create_table,
         &simple_enum_insert,
@@ -100,6 +121,10 @@ fn main() {
         &simple_enum_with_description_insert,
         &string_enum_with_description_create_table,
         &string_enum_with_description_insert,
+        &object_like_enum_create_table,
+        &object_like_enum_insert,
+        &object_like_enum_with_description_create_table,
+        &object_like_enum_with_description_insert,
     ]);
     std::fs::write("../init.sql", sql).expect("Unable to write to file.");
 }

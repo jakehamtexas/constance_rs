@@ -29,7 +29,7 @@ pub fn insert_statement<'a>(
         .iter()
         .enumerate()
         .map(|(index, SimpleEnumWithDescription { name, description })| {
-            vec![index.to_string(), name.to_owned(), description.to_owned()]
+            vec![index.to_string(), name.to_string(), description.to_string()]
         })
         .fold(raw, |statement, args| to_substituted(&statement, &args)))
 }

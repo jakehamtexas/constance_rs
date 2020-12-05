@@ -4,7 +4,7 @@ fn get_before_and_after(statement: &str) -> (String, String) {
         .split_once("?)")
         .map(|(_, after)| after)
         .unwrap_or("");
-    (before.to_owned(), after.to_owned())
+    (before.to_string(), after.to_string())
 }
 
 pub fn to_substituted(statement: &str, args: &[String]) -> String {
@@ -15,7 +15,7 @@ pub fn to_substituted(statement: &str, args: &[String]) -> String {
         args.into_iter()
             .enumerate()
             .map(|(index, arg)| if index == 0 {
-                arg.to_owned()
+                arg.to_string()
             } else {
                 format!("'{}'", arg)
             })

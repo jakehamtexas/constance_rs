@@ -27,7 +27,7 @@ pub fn insert_statement<'a>(json: &'a Vec<StringEnum>) -> Result<String, sql::Er
         .iter()
         .enumerate()
         .map(|(index, StringEnum { name, string_id })| {
-            vec![index.to_string(), name.to_owned(), string_id.to_owned()]
+            vec![index.to_string(), name.to_string(), string_id.to_string()]
         })
         .fold(raw, |statement, args| to_substituted(&statement, &args)))
 }

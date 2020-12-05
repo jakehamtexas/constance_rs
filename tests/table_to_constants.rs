@@ -158,3 +158,11 @@ pub async fn table_to_constants_mssql_string_enum_with_description() {
         assert!(false);
     }
 }
+
+#[tokio::test]
+#[ignore = "requires test script for setup/teardown"]
+pub async fn table_to_constants_mssql_object_like_enum() {}
+
+#[tokio::test]
+#[ignore = "requires test script for setup/teardown"]
+pub async fn table_to_constants_mssql_object_like_enum_with_description() {}
