@@ -1,0 +1,16 @@
+[
+  {
+    "name": "test1",
+    "value": {
+      "first": "first1",
+      "second": 1
+    }
+  },
+  {
+    "name": "test2",
+    "value": {
+      "first": "first2",
+      "second": 2
+    }
+  }
+]
