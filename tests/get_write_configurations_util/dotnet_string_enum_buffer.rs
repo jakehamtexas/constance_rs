@@ -1,0 +1,2 @@
+pub static DOTNET_STRING_ENUM_BUFFER1: &str = "namespace Constant\r\n{\r\n    public enum TestEnum\r\n    {\r\n        [System.ComponentModel.Description(\"test1\")]\r\n        Test1,\r\n        [System.ComponentModel.Description(\"test2\")]\r\n        Test2\r\n    }\r\n}\r\n";
+pub static DOTNET_STRING_ENUM_BUFFER2: &str = "namespace Constant\r\n{\r\n    public enum TestEnum\r\n    {\r\n        [System.ComponentModel.Description(\"test2\")]\r\n        Test2,\r\n        [System.ComponentModel.Description(\"test1\")]\r\n        Test1\r\n    }\r\n}\r\n";
