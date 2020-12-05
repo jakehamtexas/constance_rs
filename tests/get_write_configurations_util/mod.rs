@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 pub mod dotnet_simple_enum_buffer;
 pub mod dotnet_simple_enum_with_description_buffer;
+pub mod dotnet_string_enum_buffer;
+pub mod dotnet_string_enum_with_description_buffer;
 pub mod rust_simple_enum_buffer;
 pub mod rust_simple_enum_with_description_buffer;
 pub mod rust_string_enum_buffer;

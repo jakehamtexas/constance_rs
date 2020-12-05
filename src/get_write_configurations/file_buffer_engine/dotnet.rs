@@ -92,12 +92,51 @@ impl FileBufferEngine for Dotnet {
         [before, members, after].join("")
     }
 
-    fn string_enum(&self, _constant: &StringEnum) -> String {
-        todo!()
+    fn string_enum(&self, constant: &StringEnum) -> String {
+        let before = get_before(&constant.identifier.object_name);
+        let members = constant
+            .map
+            .iter()
+            .map(|(key, value)| {
+                [
+                    format!("[System.ComponentModel.Description(\"{}\")]", value),
+                    casing_engine::pascal_case(key),
+                ]
+                .join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str())
+            })
+            .collect::<Vec<String>>()
+            .join(
+                [COMMA, NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
+                    .join("")
+                    .as_str(),
+            );
+        let after = get_after();
+        [before, members, after].join("")
     }
 
-    fn string_enum_with_description(&self, _constant: &StringEnumWithDescription) -> String {
-        todo!()
+    fn string_enum_with_description(&self, constant: &StringEnumWithDescription) -> String {
+        let before = get_before(&constant.identifier.object_name);
+        let members = constant
+            .map
+            .iter()
+            .map(|(key, ValueWithDescription { value, description })| {
+                let comment_start = [API_COMMENT_SLASHES, SUMMARY_XML_OPEN].join(" ");
+                let comment_description = [API_COMMENT_SLASHES, description].join(" ");
+                let comment_end = [API_COMMENT_SLASHES, SUMMARY_XML_CLOSE].join(" ");
+
+                let value = format!("[System.ComponentModel.Description(\"{}\")]", value);
+                let key = casing_engine::pascal_case(key);
+                [comment_start, comment_description, comment_end, value, key]
+                    .join(&format!("{}{}{}", NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB))
+            })
+            .collect::<Vec<String>>()
+            .join(
+                [COMMA, NEWLINE, NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
+                    .join("")
+                    .as_str(),
+            );
+        let after = get_after();
+        [before, members, after].join("")
     }
 
     fn object_like(&self, _constant: &ObjectLike) -> String {
