@@ -3,7 +3,6 @@ use crate::{
     table_to_constants::table_constant::object_like::ObjectLike,
     table_to_constants::table_constant::object_like_with_description::ObjectLikeWithDescription,
     table_to_constants::table_constant::simple_enum::SimpleEnum,
-    table_to_constants::table_constant::simple_enum_with_description::SimpleEnumWithDescription,
     table_to_constants::table_constant::string_enum::StringEnum,
     table_to_constants::table_constant::string_enum_with_description::StringEnumWithDescription,
     testing_only::ValueWithDescription,
@@ -70,7 +69,7 @@ impl FileBufferEngine for Dotnet {
         [before, members, after].join("")
     }
 
-    fn simple_enum_with_description(&self, constant: &SimpleEnumWithDescription) -> String {
+    fn simple_enum_with_description(&self, constant: &SimpleEnum) -> String {
         let before = get_before(&constant.identifier.object_name);
         let members = constant
             .map
