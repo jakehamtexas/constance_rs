@@ -160,7 +160,7 @@ pub async fn table_to_constants_mssql_string_enum_with_description() {
     let table_constant = table_constants.first().unwrap();
 
     // assert
-    if let TableConstant::StringEnumWithDescription(actual) = table_constant {
+    if let TableConstant::StringEnum(actual) = table_constant {
         let has_deep_equality = actual.map.len() == expected.len()
             && actual
                 .map

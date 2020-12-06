@@ -66,24 +66,26 @@ pub fn get_write_configurations(
                 .iter()
                 .map(|engine_type| {
                     let filename = get_filename(&engine_type, c);
-                    let buffer = match &engine_type {
-                        FileBufferEngineType::Typesript(ts) => ts.string_enum(e),
-                        FileBufferEngineType::Dotnet(dotnet) => dotnet.string_enum(e),
-                        FileBufferEngineType::Rust(rs) => rs.string_enum(e),
-                    };
-                    WriteConfiguration { filename, buffer }
-                })
-                .collect::<Vec<_>>(),
-            TableConstant::StringEnumWithDescription(e) => file_buffer_engine_types
-                .iter()
-                .map(|engine_type| {
-                    let filename = get_filename(&engine_type, c);
-                    let buffer = match &engine_type {
-                        FileBufferEngineType::Typesript(ts) => ts.string_enum_with_description(e),
-                        FileBufferEngineType::Dotnet(dotnet) => {
-                            dotnet.string_enum_with_description(e)
+                    let buffer = if e
+                        .map
+                        .values()
+                        .any(|ValueWithDescription { description, .. }| description.is_some())
+                    {
+                        match &engine_type {
+                            FileBufferEngineType::Typesript(ts) => {
+                                ts.string_enum_with_description(e)
+                            }
+                            FileBufferEngineType::Dotnet(dotnet) => {
+                                dotnet.string_enum_with_description(e)
+                            }
+                            FileBufferEngineType::Rust(rs) => rs.string_enum_with_description(e),
                         }
-                        FileBufferEngineType::Rust(rs) => rs.string_enum_with_description(e),
+                    } else {
+                        match &engine_type {
+                            FileBufferEngineType::Typesript(ts) => ts.string_enum(e),
+                            FileBufferEngineType::Dotnet(dotnet) => dotnet.string_enum(e),
+                            FileBufferEngineType::Rust(rs) => rs.string_enum(e),
+                        }
                     };
                     WriteConfiguration { filename, buffer }
                 })
@@ -121,9 +123,7 @@ pub fn get_write_configurations(
 fn get_filename(engine_type: &FileBufferEngineType, constant: &TableConstant) -> String {
     let identifier = match constant {
         TableConstant::SimpleEnum(e) => e.identifier.clone(),
-
         TableConstant::StringEnum(e) => e.identifier.clone(),
-        TableConstant::StringEnumWithDescription(e) => e.identifier.clone(),
         _ => panic!("Unimplemented!"),
     };
 

@@ -14,8 +14,7 @@ pub mod typescript_string_enum_with_description_buffer;
 
 use constance::{
     testing_only::{
-        Language, SimpleEnum, StringEnum, StringEnumWithDescription, TableConstant,
-        TableIdentifier, ValueWithDescription,
+        Language, SimpleEnum, StringEnum, TableConstant, TableIdentifier, ValueWithDescription,
     },
     types::OutputOptions,
 };
@@ -121,15 +120,13 @@ pub fn get_table_constants_for_string_enum_with_description_buffer_test() -> Vec
             description: Some("description7".to_string()),
         },
     );
-    vec![TableConstant::StringEnumWithDescription(
-        StringEnumWithDescription {
-            identifier: TableIdentifier {
-                object_name: "test_enum".to_string(),
-                ..TableIdentifier::default()
-            },
-            map,
+    vec![TableConstant::StringEnum(StringEnum {
+        identifier: TableIdentifier {
+            object_name: "test_enum".to_string(),
+            ..TableIdentifier::default()
         },
-    )]
+        map,
+    })]
 }
 
 pub fn get_output_options_for_filename_test(lang: Language) -> OutputOptions {

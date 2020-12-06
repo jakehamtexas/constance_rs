@@ -5,9 +5,8 @@ use crate::{
     table_to_constants::table_constant::object_like::ObjectLike,
     table_to_constants::table_constant::object_like_with_description::ObjectLikeWithDescription,
     table_to_constants::table_constant::simple_enum::SimpleEnum,
-    table_to_constants::table_constant::string_enum::StringEnum,
-    table_to_constants::table_constant::string_enum_with_description::StringEnumWithDescription,
-    testing_only::TableIdentifier, testing_only::ValueWithDescription,
+    table_to_constants::table_constant::string_enum::StringEnum, testing_only::TableIdentifier,
+    testing_only::ValueWithDescription,
 };
 
 use super::{
@@ -91,7 +90,7 @@ impl FileBufferEngine for Rust {
         primitive_enum(&constant.map, &constant.identifier, true)
     }
 
-    fn string_enum_with_description(&self, constant: &StringEnumWithDescription) -> String {
+    fn string_enum_with_description(&self, constant: &StringEnum) -> String {
         primitive_enum_with_description(&constant.map, &constant.identifier, true)
     }
 
