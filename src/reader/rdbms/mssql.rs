@@ -184,7 +184,7 @@ impl ReadDb for Mssql {
     async fn get_records_as_object_like_with_descriptions(
         &self,
         _table_option: &TableOption,
-    ) -> HashMap<String, Vec<(String, ValueWithDescription)>> {
+    ) -> HashMap<ValueWithDescription, Vec<(String, String)>> {
         todo!()
     }
 }

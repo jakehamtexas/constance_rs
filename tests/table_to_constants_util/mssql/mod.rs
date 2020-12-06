@@ -112,3 +112,49 @@ pub fn get_string_enum_with_description_rc(options: ConnectionOptions) -> Consta
         ..base_rc
     }
 }
+
+pub fn get_object_like_enum_rc(options: ConnectionOptions) -> ConstanceRc {
+    let table_options = get_table_options(
+        "object_like_enum",
+        "name".to_string(),
+        &[
+            Column {
+                name: "first".to_string(),
+                data_type: STRING_TYPE.to_string(),
+            },
+            Column {
+                name: "second".to_string(),
+                data_type: NUMBER_TYPE.to_string(),
+            },
+        ],
+        None,
+    );
+    let base_rc = get_base_rc(options);
+    ConstanceRc {
+        table_options,
+        ..base_rc
+    }
+}
+
+pub fn get_object_like_enum_with_description_rc(options: ConnectionOptions) -> ConstanceRc {
+    let table_options = get_table_options(
+        "object_like_enum_with_description",
+        "name".to_string(),
+        &[
+            Column {
+                name: "first".to_string(),
+                data_type: STRING_TYPE.to_string(),
+            },
+            Column {
+                name: "second".to_string(),
+                data_type: NUMBER_TYPE.to_string(),
+            },
+        ],
+        Some("description".to_string()),
+    );
+    let base_rc = get_base_rc(options);
+    ConstanceRc {
+        table_options,
+        ..base_rc
+    }
+}
