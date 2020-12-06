@@ -116,22 +116,57 @@ async fn get_rows(
     }
 }
 
+struct ColumnsDto<'a> {
+    pub key_column_name: &'a String,
+    pub value_columns: &'a Vec<Column>,
+    pub description_column_name: &'a Option<String>,
+    pub column_names: Vec<&'a str>,
+}
+fn get_columns<'a>(table_option: &'a TableOption) -> ColumnsDto<'a> {
+    let key_column_name = &table_option.key_column_name;
+    let description_column_name = match &table_option.description_column_name {
+        Some(ref d) => d,
+        None => "",
+    };
+    let value_columns = &table_option.value_columns;
+    let value_column_names = value_columns
+        .iter()
+        .map(|Column { name, .. }| name.as_str())
+        .collect::<Vec<&str>>();
+    let nested_columns: Vec<Vec<&str>> = vec![
+        vec![&key_column_name],
+        vec![&description_column_name],
+        value_column_names,
+    ];
+    let column_names = nested_columns
+        .into_iter()
+        .flatten()
+        .filter(|str| !str.is_empty())
+        .collect::<Vec<&str>>();
+
+    ColumnsDto {
+        key_column_name,
+        value_columns,
+        description_column_name: &table_option.description_column_name,
+        column_names,
+    }
+}
+
 #[async_trait]
 impl ReadDb for Mssql {
     async fn get_records_as_simple_key_value_pairs(
         &self,
         table_option: &TableOption,
     ) -> HashMap<String, String> {
-        let key_column_name = &table_option.key_column_name;
-        let value_column = table_option.value_columns.first().unwrap();
-        let columns: [&str; 2] = [key_column_name, &value_column.name];
+        let columns_dto = get_columns(table_option);
+        let value_column = columns_dto.value_columns.first().unwrap();
 
         let client = self.get_client(table_option).await;
-        let rows = get_rows(client, &table_option, &columns).await;
+        let rows = get_rows(client, &table_option, &columns_dto.column_names).await;
 
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_column::<&str>(row, key_column_name);
+                let key_column = get_column::<&str>(row, columns_dto.key_column_name);
                 let value_column = get_column_of_unknown_type(row, value_column);
                 if let (Some(key), Some(value)) = (key_column, value_column) {
                     map.insert(key, value);
@@ -146,22 +181,19 @@ impl ReadDb for Mssql {
         &self,
         table_option: &TableOption,
     ) -> HashMap<String, ValueWithDescription> {
-        let key_column_name = &table_option.key_column_name;
-        let value_column = table_option.value_columns.first().unwrap();
-        let description_column_name = match &table_option.description_column_name {
-            Some(ref d) => d,
-            None => "",
-        };
-        let columns = [key_column_name, &value_column.name, description_column_name];
+        let columns_dto = get_columns(table_option);
+        let value_column = columns_dto.value_columns.first().unwrap();
 
         let client = self.get_client(table_option).await;
-        let rows = get_rows(client, &table_option, &columns).await;
+        let rows = get_rows(client, &table_option, &columns_dto.column_names).await;
+
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_column::<&str>(row, &key_column_name);
+                let key_column = get_column::<&str>(row, &columns_dto.key_column_name);
                 let value_column = get_column_of_unknown_type(row, &value_column);
                 let description =
-                    get_column::<&str>(row, description_column_name).unwrap_or_default();
+                    get_column::<&str>(row, &columns_dto.description_column_name.as_ref().unwrap())
+                        .unwrap_or_default();
                 if let (Some(key), Some(value)) = (key_column, value_column) {
                     let value_with_description = ValueWithDescription { value, description };
                     map.insert(key, value_with_description);
@@ -176,21 +208,15 @@ impl ReadDb for Mssql {
         &self,
         table_option: &TableOption,
     ) -> HashMap<String, Vec<(String, String)>> {
-        let key_column_name = &table_option.key_column_name;
-        let value_columns = &table_option.value_columns;
-        let value_column_names = value_columns
-            .iter()
-            .map(|Column { name, .. }| name.as_str())
-            .collect::<Vec<&str>>();
-        let nested_columns: Vec<Vec<&str>> = vec![vec![&key_column_name], value_column_names];
-        let columns = nested_columns.into_iter().flatten().collect::<Vec<&str>>();
+        let columns_dto = get_columns(table_option);
 
         let client = self.get_client(table_option).await;
-        let rows = get_rows(client, &table_option, &columns).await;
+        let rows = get_rows(client, &table_option, &columns_dto.column_names).await;
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_column::<&str>(row, &key_column_name);
-                let value_columns = value_columns
+                let key_column = get_column::<&str>(row, &columns_dto.key_column_name);
+                let value_columns = columns_dto
+                    .value_columns
                     .iter()
                     .map(|column| match get_column_of_unknown_type(row, column) {
                         Some(column_value) => Some((column.name.to_string(), column_value)),
@@ -211,31 +237,18 @@ impl ReadDb for Mssql {
         &self,
         table_option: &TableOption,
     ) -> HashMap<ValueWithDescription, Vec<(String, String)>> {
-        let key_column_name = &table_option.key_column_name;
-        let description_column_name = match &table_option.description_column_name {
-            Some(ref d) => d,
-            None => "",
-        };
-        let value_columns = &table_option.value_columns;
-        let value_column_names = value_columns
-            .iter()
-            .map(|Column { name, .. }| name.as_str())
-            .collect::<Vec<&str>>();
-        let nested_columns: Vec<Vec<&str>> = vec![
-            vec![&key_column_name],
-            vec![&description_column_name],
-            value_column_names,
-        ];
-        let columns = nested_columns.into_iter().flatten().collect::<Vec<&str>>();
+        let columns_dto = get_columns(table_option);
 
         let client = self.get_client(table_option).await;
-        let rows = get_rows(client, &table_option, &columns).await;
+        let rows = get_rows(client, &table_option, &columns_dto.column_names).await;
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_column::<&str>(row, &key_column_name);
+                let key_column = get_column::<&str>(row, &columns_dto.key_column_name);
                 let description_column =
-                    get_column::<&str>(row, &description_column_name).unwrap_or_default();
-                let value_columns = value_columns
+                    get_column::<&str>(row, &columns_dto.description_column_name.as_ref().unwrap())
+                        .unwrap_or_default();
+                let value_columns = columns_dto
+                    .value_columns
                     .iter()
                     .map(|column| match get_column_of_unknown_type(row, column) {
                         Some(column_value) => Some((column.name.to_string(), column_value)),
