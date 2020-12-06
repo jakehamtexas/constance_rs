@@ -81,21 +81,6 @@ fn get_panic_message(columns: &[&str]) -> String {
     )
 }
 
-async fn get_rows(
-    mut client: Client<Compat<TcpStream>>,
-    columns: &[&str],
-    table_identifier: &str,
-) -> Result<Vec<Row>, Error> {
-    let query = client
-        .query(get_select_statement(columns, table_identifier), &[])
-        .await
-        .map(|query| query.into_first_result());
-    match query {
-        Ok(query) => query.await,
-        Err(_) => panic!(get_panic_message(columns)),
-    }
-}
-
 fn get_column_of_unknown_type(row: &Row, column: &Column) -> Option<String> {
     let column_type = &column.data_type;
     let column_name = &column.name;
@@ -115,6 +100,22 @@ fn get_table_identifier(table_option: &TableOption) -> String {
     .join(".")
 }
 
+async fn get_rows(
+    mut client: Client<Compat<TcpStream>>,
+    table_option: &TableOption,
+    columns: &[&str],
+) -> Result<Vec<Row>, Error> {
+    let identifier = get_table_identifier(table_option);
+    let query = client
+        .query(get_select_statement(columns, &identifier), &[])
+        .await
+        .map(|query| query.into_first_result());
+    match query {
+        Ok(query) => query.await,
+        Err(_) => panic!(get_panic_message(columns)),
+    }
+}
+
 #[async_trait]
 impl ReadDb for Mssql {
     async fn get_records_as_simple_key_value_pairs(
@@ -126,8 +127,7 @@ impl ReadDb for Mssql {
         let columns: [&str; 2] = [key_column_name, &value_column.name];
 
         let client = self.get_client(table_option).await;
-        let identifier = get_table_identifier(table_option);
-        let rows = get_rows(client, &columns, &identifier).await;
+        let rows = get_rows(client, &table_option, &columns).await;
 
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
@@ -155,9 +155,7 @@ impl ReadDb for Mssql {
         let columns = [key_column_name, &value_column.name, description_column_name];
 
         let client = self.get_client(table_option).await;
-        let identifier = get_table_identifier(table_option);
-        let rows = get_rows(client, &columns, &identifier).await;
-
+        let rows = get_rows(client, &table_option, &columns).await;
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
                 let key_column = get_column::<&str>(row, &key_column_name);
@@ -188,8 +186,7 @@ impl ReadDb for Mssql {
         let columns = nested_columns.into_iter().flatten().collect::<Vec<&str>>();
 
         let client = self.get_client(table_option).await;
-        let identifier = get_table_identifier(table_option);
-        let rows = get_rows(client, &columns[..], &identifier).await;
+        let rows = get_rows(client, &table_option, &columns).await;
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
                 let key_column = get_column::<&str>(row, &key_column_name);
@@ -232,8 +229,7 @@ impl ReadDb for Mssql {
         let columns = nested_columns.into_iter().flatten().collect::<Vec<&str>>();
 
         let client = self.get_client(table_option).await;
-        let identifier = get_table_identifier(table_option);
-        let rows = get_rows(client, &columns[..], &identifier).await;
+        let rows = get_rows(client, &table_option, &columns).await;
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
                 let key_column = get_column::<&str>(row, &key_column_name);
