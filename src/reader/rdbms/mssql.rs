@@ -64,10 +64,8 @@ fn get_column<'a, ToStringable: ToString + FromSql<'a>>(
     row: &'a Row,
     column_name: &str,
 ) -> Option<String> {
-    match row.get::<ToStringable, &str>(column_name) {
-        Some(i) => Some(i.to_string()),
-        None => None,
-    }
+    row.get::<ToStringable, &str>(column_name)
+        .map(|to_stringable| to_stringable.to_string())
 }
 
 fn get_select_statement(columns: &[&str], table_identifier: &str) -> String {
@@ -218,9 +216,9 @@ impl ReadDb for Mssql {
                 let value_columns = columns_dto
                     .value_columns
                     .iter()
-                    .map(|column| match get_column_of_unknown_type(row, column) {
-                        Some(column_value) => Some((column.name.to_string(), column_value)),
-                        None => None,
+                    .map(|column| {
+                        get_column_of_unknown_type(row, column)
+                            .map(|column_value| (column.name.to_string(), column_value))
                     })
                     .filter_map(|v| v)
                     .collect::<Vec<(String, String)>>();
@@ -250,9 +248,9 @@ impl ReadDb for Mssql {
                 let value_columns = columns_dto
                     .value_columns
                     .iter()
-                    .map(|column| match get_column_of_unknown_type(row, column) {
-                        Some(column_value) => Some((column.name.to_string(), column_value)),
-                        None => None,
+                    .map(|column| {
+                        get_column_of_unknown_type(row, column)
+                            .map(|column_value| (column.name.to_string(), column_value))
                     })
                     .filter_map(|v| v)
                     .collect::<Vec<(String, String)>>();
