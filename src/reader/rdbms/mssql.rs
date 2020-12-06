@@ -62,10 +62,14 @@ impl Mssql {
 
 fn get_column<'a, ToStringable: ToString + FromSql<'a>>(
     row: &'a Row,
-    column_name: &str,
+    column_name: Option<&String>,
 ) -> Option<String> {
-    row.get::<ToStringable, &str>(column_name)
-        .map(|to_stringable| to_stringable.to_string())
+    match column_name {
+        Some(name) => row
+            .get::<ToStringable, &str>(name)
+            .map(|to_stringable| to_stringable.to_string()),
+        None => None,
+    }
 }
 
 fn get_select_statement(columns: &[&str], table_identifier: &str) -> String {
@@ -83,8 +87,8 @@ fn get_column_of_unknown_type(row: &Row, column: &Column) -> Option<String> {
     let column_type = &column.data_type;
     let column_name = &column.name;
     match ColumnType::from_string(column_type) {
-        ColumnType::Number => get_column::<i32>(&row, &column_name),
-        ColumnType::String => get_column::<&str>(&row, &column_name),
+        ColumnType::Number => get_column::<i32>(&row, Some(&column_name)),
+        ColumnType::String => get_column::<&str>(&row, Some(&column_name)),
     }
 }
 
@@ -155,29 +159,6 @@ impl ReadDb for Mssql {
     async fn get_records_as_simple_key_value_pairs(
         &self,
         table_option: &TableOption,
-    ) -> HashMap<String, String> {
-        let columns_dto = get_columns(table_option);
-        let value_column = columns_dto.value_columns.first().unwrap();
-
-        let client = self.get_client(table_option).await;
-        let rows = get_rows(client, &table_option, &columns_dto.column_names).await;
-
-        rows.map(|rows| {
-            rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_column::<&str>(row, columns_dto.key_column_name);
-                let value_column = get_column_of_unknown_type(row, value_column);
-                if let (Some(key), Some(value)) = (key_column, value_column) {
-                    map.insert(key, value);
-                }
-                map
-            })
-        })
-        .unwrap()
-    }
-
-    async fn get_records_with_meta_description_column(
-        &self,
-        table_option: &TableOption,
     ) -> HashMap<String, ValueWithDescription> {
         let columns_dto = get_columns(table_option);
         let value_column = columns_dto.value_columns.first().unwrap();
@@ -187,11 +168,10 @@ impl ReadDb for Mssql {
 
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_column::<&str>(row, &columns_dto.key_column_name);
+                let key_column = get_column::<&str>(row, Some(columns_dto.key_column_name));
                 let value_column = get_column_of_unknown_type(row, &value_column);
                 let description =
-                    get_column::<&str>(row, &columns_dto.description_column_name.as_ref().unwrap())
-                        .unwrap_or_default();
+                    get_column::<&str>(row, columns_dto.description_column_name.as_ref());
                 if let (Some(key), Some(value)) = (key_column, value_column) {
                     let value_with_description = ValueWithDescription { value, description };
                     map.insert(key, value_with_description);
@@ -205,35 +185,6 @@ impl ReadDb for Mssql {
     async fn get_records_as_object_like(
         &self,
         table_option: &TableOption,
-    ) -> HashMap<String, Vec<(String, String)>> {
-        let columns_dto = get_columns(table_option);
-
-        let client = self.get_client(table_option).await;
-        let rows = get_rows(client, &table_option, &columns_dto.column_names).await;
-        rows.map(|rows| {
-            rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_column::<&str>(row, &columns_dto.key_column_name);
-                let value_columns = columns_dto
-                    .value_columns
-                    .iter()
-                    .map(|column| {
-                        get_column_of_unknown_type(row, column)
-                            .map(|column_value| (column.name.to_string(), column_value))
-                    })
-                    .filter_map(|v| v)
-                    .collect::<Vec<(String, String)>>();
-                if let Some(key) = key_column {
-                    map.insert(key, value_columns);
-                }
-                map
-            })
-        })
-        .unwrap()
-    }
-
-    async fn get_records_as_object_like_with_descriptions(
-        &self,
-        table_option: &TableOption,
     ) -> HashMap<ValueWithDescription, Vec<(String, String)>> {
         let columns_dto = get_columns(table_option);
 
@@ -241,10 +192,9 @@ impl ReadDb for Mssql {
         let rows = get_rows(client, &table_option, &columns_dto.column_names).await;
         rows.map(|rows| {
             rows.iter().fold(HashMap::new(), |mut map, row| {
-                let key_column = get_column::<&str>(row, &columns_dto.key_column_name);
+                let key_column = get_column::<&str>(row, Some(columns_dto.key_column_name));
                 let description_column =
-                    get_column::<&str>(row, &columns_dto.description_column_name.as_ref().unwrap())
-                        .unwrap_or_default();
+                    get_column::<&str>(row, columns_dto.description_column_name.as_ref());
                 let value_columns = columns_dto
                     .value_columns
                     .iter()

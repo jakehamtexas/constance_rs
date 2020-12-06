@@ -31,13 +31,13 @@ fn get_after() -> String {
 pub struct Rust {}
 
 fn primitive_enum(
-    map: &HashMap<String, String>,
+    map: &HashMap<String, ValueWithDescription>,
     identifier: &TableIdentifier,
     quotes: bool,
 ) -> String {
     let members = map
         .iter()
-        .map(|(key, value)| {
+        .map(|(key, ValueWithDescription { value, .. })| {
             format!(
                 "{} = {}",
                 casing_engine::pascal_case(key),
@@ -62,13 +62,14 @@ fn primitive_enum_with_description(
 ) -> String {
     let before = get_before(identifier);
     let members = map
-        .iter()
+        .clone()
+        .into_iter()
         .map(|(key, ValueWithDescription { value, description })| {
-            let comment = [COMMENT_START, description, COMMENT_END].join(" ");
+            let comment = [COMMENT_START, &description.unwrap(), COMMENT_END].join(" ");
             let member = format!(
                 "{} = {}",
-                casing_engine::pascal_case(key),
-                get_value(value, quotes)
+                casing_engine::pascal_case(&key),
+                get_value(&value, quotes)
             );
             [comment, member].join(&format!("{}{}", NEWLINE, FOUR_SPACE_TAB))
         })

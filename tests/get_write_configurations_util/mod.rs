@@ -32,8 +32,20 @@ pub fn get_table_constants_for_filename_test() -> Vec<TableConstant> {
 
 pub fn get_table_constants_for_simple_enum_buffer_test() -> Vec<TableConstant> {
     let mut map = HashMap::new();
-    map.insert("test1".to_string(), "5".to_string());
-    map.insert("test2".to_string(), "7".to_string());
+    map.insert(
+        "test1".to_string(),
+        ValueWithDescription {
+            value: "5".to_string(),
+            description: None,
+        },
+    );
+    map.insert(
+        "test2".to_string(),
+        ValueWithDescription {
+            value: "7".to_string(),
+            description: None,
+        },
+    );
     vec![TableConstant::SimpleEnum(SimpleEnum {
         identifier: TableIdentifier {
             object_name: "test_enum".to_string(),
@@ -45,8 +57,20 @@ pub fn get_table_constants_for_simple_enum_buffer_test() -> Vec<TableConstant> {
 
 pub fn get_table_constants_for_string_enum_buffer_test() -> Vec<TableConstant> {
     let mut map = HashMap::new();
-    map.insert("test1".to_string(), "test1".to_string());
-    map.insert("test2".to_string(), "test2".to_string());
+    map.insert(
+        "test1".to_string(),
+        ValueWithDescription {
+            value: "test1".to_string(),
+            description: None,
+        },
+    );
+    map.insert(
+        "test2".to_string(),
+        ValueWithDescription {
+            value: "test2".to_string(),
+            description: None,
+        },
+    );
     vec![TableConstant::StringEnum(StringEnum {
         identifier: TableIdentifier {
             object_name: "test_enum".to_string(),
@@ -62,14 +86,14 @@ pub fn get_table_constants_for_simple_enum_with_description_buffer_test() -> Vec
         "test1".to_string(),
         ValueWithDescription {
             value: "5".to_string(),
-            description: "description5".to_string(),
+            description: Some("description5".to_string()),
         },
     );
     map.insert(
         "test2".to_string(),
         ValueWithDescription {
             value: "7".to_string(),
-            description: "description7".to_string(),
+            description: Some("description7".to_string()),
         },
     );
     vec![TableConstant::SimpleEnumWithDescription(
@@ -89,14 +113,14 @@ pub fn get_table_constants_for_string_enum_with_description_buffer_test() -> Vec
         "test1".to_string(),
         ValueWithDescription {
             value: "test1".to_string(),
-            description: "description5".to_string(),
+            description: Some("description5".to_string()),
         },
     );
     map.insert(
         "test2".to_string(),
         ValueWithDescription {
             value: "test2".to_string(),
-            description: "description7".to_string(),
+            description: Some("description7".to_string()),
         },
     );
     vec![TableConstant::StringEnumWithDescription(

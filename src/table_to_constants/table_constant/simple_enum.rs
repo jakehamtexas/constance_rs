@@ -1,12 +1,14 @@
+use value_with_description::ValueWithDescription;
+
 use crate::{
     constancerc::dto::{table_identifier::TableIdentifier, table_option::TableOption},
-    reader::{rdbms::Rdbms, read_db::ReadDb},
+    reader::{rdbms::Rdbms, read_db::ReadDb, value_with_description},
 };
 use std::collections::HashMap;
 
 #[derive(Debug, Default)]
 pub struct SimpleEnum {
-    pub map: HashMap<String, String>,
+    pub map: HashMap<String, ValueWithDescription>,
     pub identifier: TableIdentifier,
 }
 impl SimpleEnum {

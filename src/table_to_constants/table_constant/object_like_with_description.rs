@@ -14,10 +14,7 @@ pub struct ObjectLikeWithDescription {
 impl ObjectLikeWithDescription {
     pub async fn new(option: &TableOption, db: &Rdbms) -> Self {
         let map = match db {
-            Rdbms::Mssql(db) => {
-                db.get_records_as_object_like_with_descriptions(option)
-                    .await
-            }
+            Rdbms::Mssql(db) => db.get_records_as_object_like(option).await,
         };
         let identifier = option.identifier.clone();
         ObjectLikeWithDescription { map, identifier }

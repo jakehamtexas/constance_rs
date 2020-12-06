@@ -57,7 +57,9 @@ impl FileBufferEngine for Dotnet {
         let members = constant
             .map
             .iter()
-            .map(|(key, value)| format!("{} = {}", casing_engine::pascal_case(key), value))
+            .map(|(key, ValueWithDescription { value, .. })| {
+                format!("{} = {}", casing_engine::pascal_case(key), value)
+            })
             .collect::<Vec<String>>()
             .join(
                 [COMMA, NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
@@ -72,13 +74,14 @@ impl FileBufferEngine for Dotnet {
         let before = get_before(&constant.identifier.object_name);
         let members = constant
             .map
-            .iter()
+            .clone()
+            .into_iter()
             .map(|(key, ValueWithDescription { value, description })| {
                 let comment_start = [API_COMMENT_SLASHES, SUMMARY_XML_OPEN].join(" ");
-                let comment_description = [API_COMMENT_SLASHES, description].join(" ");
+                let comment_description = [API_COMMENT_SLASHES, &description.unwrap()].join(" ");
                 let comment_end = [API_COMMENT_SLASHES, SUMMARY_XML_CLOSE].join(" ");
 
-                let member = format!("{} = {}", casing_engine::pascal_case(key), value);
+                let member = format!("{} = {}", casing_engine::pascal_case(&key), value);
                 [comment_start, comment_description, comment_end, member]
                     .join(&format!("{}{}{}", NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB))
             })
@@ -97,7 +100,7 @@ impl FileBufferEngine for Dotnet {
         let members = constant
             .map
             .iter()
-            .map(|(key, value)| {
+            .map(|(key, ValueWithDescription { value, .. })| {
                 [
                     format!("[System.ComponentModel.Description(\"{}\")]", value),
                     casing_engine::pascal_case(key),
@@ -118,14 +121,15 @@ impl FileBufferEngine for Dotnet {
         let before = get_before(&constant.identifier.object_name);
         let members = constant
             .map
-            .iter()
+            .clone()
+            .into_iter()
             .map(|(key, ValueWithDescription { value, description })| {
                 let comment_start = [API_COMMENT_SLASHES, SUMMARY_XML_OPEN].join(" ");
-                let comment_description = [API_COMMENT_SLASHES, description].join(" ");
+                let comment_description = [API_COMMENT_SLASHES, &description.unwrap()].join(" ");
                 let comment_end = [API_COMMENT_SLASHES, SUMMARY_XML_CLOSE].join(" ");
 
                 let value = format!("[System.ComponentModel.Description(\"{}\")]", value);
-                let key = casing_engine::pascal_case(key);
+                let key = casing_engine::pascal_case(&key);
                 [comment_start, comment_description, comment_end, value, key]
                     .join(&format!("{}{}{}", NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB))
             })

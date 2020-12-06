@@ -4,11 +4,12 @@ use crate::{
     constancerc::dto::table_option::TableOption,
     reader::{rdbms::Rdbms, read_db::ReadDb},
     testing_only::TableIdentifier,
+    testing_only::ValueWithDescription,
 };
 
 #[derive(Debug)]
 pub struct ObjectLike {
-    pub map: HashMap<String, Vec<(String, String)>>,
+    pub map: HashMap<ValueWithDescription, Vec<(String, String)>>,
     pub identifier: TableIdentifier,
 }
 impl ObjectLike {

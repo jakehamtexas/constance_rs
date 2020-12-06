@@ -31,13 +31,13 @@ use super::{
 pub struct Typescript {}
 
 fn primitive_enum(
-    map: &HashMap<String, String>,
+    map: &HashMap<String, ValueWithDescription>,
     identifier: &TableIdentifier,
     quotes: bool,
 ) -> String {
     let members = map
         .iter()
-        .map(|(key, value)| {
+        .map(|(key, ValueWithDescription { value, .. })| {
             format!(
                 "{} = {}",
                 casing_engine::pascal_case(key),
@@ -62,14 +62,15 @@ fn primitive_enum_with_description(
 ) -> String {
     let before = get_before(identifier);
     let members = map
-        .iter()
+        .clone()
+        .into_iter()
         .map(|(key, ValueWithDescription { value, description })| {
-            let comment_description = ["", API_COMMENT_STAR, description].join(" ");
+            let comment_description = ["", API_COMMENT_STAR, &description.unwrap()].join(" ");
             let comment_end = ["", COMMENT_END].join(" ");
             let member = format!(
                 "{} = {}",
-                casing_engine::pascal_case(key),
-                get_value(value, quotes)
+                casing_engine::pascal_case(&key),
+                get_value(&value, quotes)
             );
             [
                 COMMENT_START.to_owned(),

@@ -11,7 +11,7 @@ pub struct SimpleEnumWithDescription {
 impl SimpleEnumWithDescription {
     pub async fn new(option: &TableOption, db: &Rdbms) -> Self {
         let map = match db {
-            Rdbms::Mssql(db) => db.get_records_with_meta_description_column(option).await,
+            Rdbms::Mssql(db) => db.get_records_as_simple_key_value_pairs(option).await,
         };
         let identifier = option.identifier.clone();
         Self { map, identifier }
