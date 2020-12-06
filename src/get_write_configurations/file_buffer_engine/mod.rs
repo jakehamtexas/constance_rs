@@ -5,7 +5,6 @@ pub mod typescript;
 
 use crate::{
     table_to_constants::table_constant::object_like::ObjectLike,
-    table_to_constants::table_constant::object_like_with_description::ObjectLikeWithDescription,
     table_to_constants::table_constant::simple_enum::SimpleEnum,
     table_to_constants::table_constant::string_enum::StringEnum,
 };
@@ -18,7 +17,7 @@ pub trait FileBufferEngine {
     fn string_enum(&self, _constant: &StringEnum) -> String;
     fn string_enum_with_description(&self, _constant: &StringEnum) -> String;
     fn object_like(&self, _constant: &ObjectLike) -> String;
-    fn object_like_with_description(&self, _constant: &ObjectLikeWithDescription) -> String;
+    fn object_like_with_description(&self, _constant: &ObjectLike) -> String;
 }
 
 pub enum FileBufferEngineType {

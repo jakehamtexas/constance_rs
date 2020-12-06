@@ -94,25 +94,28 @@ pub fn get_write_configurations(
                 .iter()
                 .map(|engine_type| {
                     let filename = get_filename(&engine_type, c);
-                    let buffer = match &engine_type {
-                        FileBufferEngineType::Typesript(ts) => ts.object_like(e),
-                        FileBufferEngineType::Dotnet(dotnet) => dotnet.object_like(e),
-                        FileBufferEngineType::Rust(rs) => rs.object_like(e),
-                    };
-                    WriteConfiguration { filename, buffer }
-                })
-                .collect::<Vec<_>>(),
-            TableConstant::ObjectLikeWithDescription(e) => file_buffer_engine_types
-                .iter()
-                .map(|engine_type| {
-                    let filename = get_filename(&engine_type, c);
-                    let buffer = match &engine_type {
-                        FileBufferEngineType::Typesript(ts) => ts.object_like_with_description(e),
-                        FileBufferEngineType::Dotnet(dotnet) => {
-                            dotnet.object_like_with_description(e)
+                    let buffer = if e
+                        .map
+                        .keys()
+                        .any(|ValueWithDescription { description, .. }| description.is_some())
+                    {
+                        match &engine_type {
+                            FileBufferEngineType::Typesript(ts) => {
+                                ts.object_like_with_description(e)
+                            }
+                            FileBufferEngineType::Dotnet(dotnet) => {
+                                dotnet.object_like_with_description(e)
+                            }
+                            FileBufferEngineType::Rust(rs) => rs.object_like_with_description(e),
                         }
-                        FileBufferEngineType::Rust(rs) => rs.object_like_with_description(e),
+                    } else {
+                        match &engine_type {
+                            FileBufferEngineType::Typesript(ts) => ts.object_like(e),
+                            FileBufferEngineType::Dotnet(dotnet) => dotnet.object_like(e),
+                            FileBufferEngineType::Rust(rs) => rs.object_like(e),
+                        }
                     };
+
                     WriteConfiguration { filename, buffer }
                 })
                 .collect::<Vec<_>>(),

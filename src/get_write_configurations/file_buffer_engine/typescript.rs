@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use crate::{
     get_write_configurations::casing_engine,
     table_to_constants::table_constant::object_like::ObjectLike,
-    table_to_constants::table_constant::object_like_with_description::ObjectLikeWithDescription,
     table_to_constants::table_constant::simple_enum::SimpleEnum,
     table_to_constants::table_constant::string_enum::StringEnum, testing_only::TableIdentifier,
     testing_only::ValueWithDescription,
@@ -105,7 +104,7 @@ impl FileBufferEngine for Typescript {
         todo!()
     }
 
-    fn object_like_with_description(&self, _constant: &ObjectLikeWithDescription) -> String {
+    fn object_like_with_description(&self, _constant: &ObjectLike) -> String {
         todo!()
     }
 }
