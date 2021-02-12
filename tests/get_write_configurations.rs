@@ -6,6 +6,10 @@ use get_write_configurations_util::{
     dotnet_object_like_enum_buffer::{
         DOTNET_OBJECT_LIKE_ENUM_BUFFER1, DOTNET_OBJECT_LIKE_ENUM_BUFFER2,
     },
+    dotnet_object_like_enum_with_description_buffer::{
+        DOTNET_OBJECT_LIKE_ENUM_WITH_DESCRIPTION_BUFFER1,
+        DOTNET_OBJECT_LIKE_ENUM_WITH_DESCRIPTION_BUFFER2,
+    },
     dotnet_simple_enum_buffer::DOTNET_SIMPLE_ENUM_BUFFER1,
     dotnet_simple_enum_buffer::DOTNET_SIMPLE_ENUM_BUFFER2,
     dotnet_simple_enum_with_description_buffer::DOTNET_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1,
@@ -17,6 +21,7 @@ use get_write_configurations_util::{
     },
     get_output_options_for_filename_test, get_table_constants_for_filename_test,
     get_table_constants_for_object_like_buffer_test,
+    get_table_constants_for_object_like_with_description_buffer_test,
     get_table_constants_for_simple_enum_buffer_test,
     get_table_constants_for_simple_enum_with_description_buffer_test,
     get_table_constants_for_string_enum_buffer_test,
@@ -245,6 +250,14 @@ fn do_object_like_buffer_test(lang: Language, expecteds: &[&str]) {
 
     do_buffer_assertion(&table_constants, &output_options, expecteds);
 }
+
+fn do_object_like_with_description_buffer_test(lang: Language, expecteds: &[&str]) {
+    // arrange
+    let table_constants = get_table_constants_for_object_like_with_description_buffer_test();
+    let output_options = get_output_options_for_filename_test(lang);
+
+    do_buffer_assertion(&table_constants, &output_options, expecteds);
+}
 #[test]
 pub fn dotnet_object_like_enum_buffer() {
     do_object_like_buffer_test(
@@ -252,6 +265,17 @@ pub fn dotnet_object_like_enum_buffer() {
         &[
             DOTNET_OBJECT_LIKE_ENUM_BUFFER1,
             DOTNET_OBJECT_LIKE_ENUM_BUFFER2,
+        ],
+    )
+}
+
+#[test]
+pub fn dotnet_object_like_enum_with_description_buffer() {
+    do_object_like_with_description_buffer_test(
+        Language::Dotnet,
+        &[
+            DOTNET_OBJECT_LIKE_ENUM_WITH_DESCRIPTION_BUFFER1,
+            DOTNET_OBJECT_LIKE_ENUM_WITH_DESCRIPTION_BUFFER2,
         ],
     )
 }

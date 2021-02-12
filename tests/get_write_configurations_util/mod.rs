@@ -187,6 +187,61 @@ pub fn get_table_constants_for_object_like_buffer_test() -> Vec<TableConstant> {
     })]
 }
 
+pub fn get_table_constants_for_object_like_with_description_buffer_test() -> Vec<TableConstant> {
+    let mut map = HashMap::new();
+    map.insert(
+        ValueWithDescription {
+            value: "test1".to_string(),
+            description: Some("description1".to_string()),
+        },
+        vec![
+            (
+                Column {
+                    name: "first".to_string(),
+                    data_type: STRING_TYPE.to_string(),
+                },
+                "first1".to_string(),
+            ),
+            (
+                Column {
+                    name: "second".to_string(),
+                    data_type: NUMBER_TYPE.to_string(),
+                },
+                "1".to_string(),
+            ),
+        ],
+    );
+    map.insert(
+        ValueWithDescription {
+            value: "test2".to_string(),
+            description: Some("description2".to_string()),
+        },
+        vec![
+            (
+                Column {
+                    name: "first".to_string(),
+                    data_type: STRING_TYPE.to_string(),
+                },
+                "first2".to_string(),
+            ),
+            (
+                Column {
+                    name: "second".to_string(),
+                    data_type: NUMBER_TYPE.to_string(),
+                },
+                "2".to_string(),
+            ),
+        ],
+    );
+    vec![TableConstant::ObjectLike(ObjectLike {
+        identifier: TableIdentifier {
+            object_name: "test_enum".to_string(),
+            ..TableIdentifier::default()
+        },
+        map,
+    })]
+}
+
 pub fn get_output_options_for_filename_test(lang: Language) -> OutputOptions {
     OutputOptions {
         language_targets: Some(vec![lang.to_string()]),
