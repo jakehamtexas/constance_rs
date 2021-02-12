@@ -1,7 +1,7 @@
 use super::column_type::{NUMBER_TYPE, STRING_TYPE};
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct Column {
     pub name: String,

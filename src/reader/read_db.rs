@@ -1,5 +1,5 @@
 use super::value_with_description::ValueWithDescription;
-use crate::constancerc::dto::table_option::TableOption;
+use crate::{constancerc::dto::table_option::TableOption, testing_only::Column};
 use async_trait::async_trait;
 use std::collections::HashMap;
 
@@ -12,5 +12,5 @@ pub trait ReadDb {
     async fn get_records_as_object_like(
         &self,
         table_option: &TableOption,
-    ) -> HashMap<ValueWithDescription, Vec<(String, String)>>;
+    ) -> HashMap<ValueWithDescription, Vec<(Column, String)>>;
 }

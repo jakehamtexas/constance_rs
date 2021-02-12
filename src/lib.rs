@@ -35,6 +35,6 @@ pub mod testing_only {
     };
     pub use super::reader::{rdbms::MSSQL, value_with_description::ValueWithDescription};
     pub use super::table_to_constants::table_constant::{
-        simple_enum::SimpleEnum, string_enum::StringEnum, TableConstant,
+        object_like::ObjectLike, simple_enum::SimpleEnum, string_enum::StringEnum, TableConstant,
     };
 }

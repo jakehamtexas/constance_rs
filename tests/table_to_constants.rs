@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
 use constance::{
-    functions::get_database, functions::get_table_constants, testing_only::TableConstant,
-    testing_only::ValueWithDescription,
+    functions::get_database,
+    functions::get_table_constants,
+    testing_only::TableConstant,
+    testing_only::{Column, ValueWithDescription, NUMBER_TYPE, STRING_TYPE},
 };
 use table_to_constants_util::{get_connection_options_from_env, mssql};
 
@@ -181,15 +183,27 @@ pub async fn table_to_constants_mssql_object_like_enum() {
     let rc = mssql::get_object_like_enum_rc(connection_options);
     let db = get_database(&rc);
     let table_options = &rc.table_options;
-    let mut expected: HashMap<ValueWithDescription, Vec<(String, String)>> = HashMap::new();
+    let mut expected = HashMap::new();
     expected.insert(
         ValueWithDescription {
             value: "test1".to_string(),
             description: None,
         },
         vec![
-            ("first".to_string(), "first1".to_string()),
-            ("second".to_string(), "1".to_string()),
+            (
+                Column {
+                    name: "first".to_string(),
+                    data_type: STRING_TYPE.to_string(),
+                },
+                "first1".to_string(),
+            ),
+            (
+                Column {
+                    name: "second".to_string(),
+                    data_type: NUMBER_TYPE.to_string(),
+                },
+                "1".to_string(),
+            ),
         ],
     );
     expected.insert(
@@ -198,8 +212,20 @@ pub async fn table_to_constants_mssql_object_like_enum() {
             description: None,
         },
         vec![
-            ("first".to_string(), "first2".to_string()),
-            ("second".to_string(), "2".to_string()),
+            (
+                Column {
+                    name: "first".to_string(),
+                    data_type: STRING_TYPE.to_string(),
+                },
+                "first2".to_string(),
+            ),
+            (
+                Column {
+                    name: "second".to_string(),
+                    data_type: NUMBER_TYPE.to_string(),
+                },
+                "2".to_string(),
+            ),
         ],
     );
 
@@ -211,11 +237,13 @@ pub async fn table_to_constants_mssql_object_like_enum() {
     // assert
     if let TableConstant::ObjectLike(actual) = table_constant {
         let has_deep_equality = actual.map.len() == expected.len()
-            && actual
-                .map
-                .clone()
-                .into_iter()
-                .all(|(k, v)| expected.contains_key(&k) && *expected.get(&k).unwrap() == v);
+            && actual.map.clone().into_iter().all(|(k, v)| {
+                expected
+                    .get(&k)
+                    .unwrap()
+                    .iter()
+                    .all(|e| v.iter().any(|v_member| v_member == e))
+            });
         assert!(has_deep_equality);
     } else {
         assert!(false);
@@ -230,15 +258,27 @@ pub async fn table_to_constants_mssql_object_like_enum_with_description() {
     let rc = mssql::get_object_like_enum_with_description_rc(connection_options);
     let db = get_database(&rc);
     let table_options = &rc.table_options;
-    let mut expected: HashMap<ValueWithDescription, Vec<(String, String)>> = HashMap::new();
+    let mut expected = HashMap::new();
     expected.insert(
         ValueWithDescription {
             value: "test1".to_string(),
             description: Some("test1description".to_string()),
         },
         vec![
-            ("first".to_string(), "first1".to_string()),
-            ("second".to_string(), "1".to_string()),
+            (
+                Column {
+                    name: "first".to_string(),
+                    data_type: STRING_TYPE.to_string(),
+                },
+                "first1".to_string(),
+            ),
+            (
+                Column {
+                    name: "second".to_string(),
+                    data_type: NUMBER_TYPE.to_string(),
+                },
+                "1".to_string(),
+            ),
         ],
     );
     expected.insert(
@@ -247,8 +287,20 @@ pub async fn table_to_constants_mssql_object_like_enum_with_description() {
             description: Some("test2description".to_string()),
         },
         vec![
-            ("first".to_string(), "first2".to_string()),
-            ("second".to_string(), "2".to_string()),
+            (
+                Column {
+                    name: "first".to_string(),
+                    data_type: STRING_TYPE.to_string(),
+                },
+                "first2".to_string(),
+            ),
+            (
+                Column {
+                    name: "second".to_string(),
+                    data_type: NUMBER_TYPE.to_string(),
+                },
+                "2".to_string(),
+            ),
         ],
     );
 
@@ -260,11 +312,13 @@ pub async fn table_to_constants_mssql_object_like_enum_with_description() {
     // assert
     if let TableConstant::ObjectLike(actual) = table_constant {
         let has_deep_equality = actual.map.len() == expected.len()
-            && actual
-                .map
-                .clone()
-                .into_iter()
-                .all(|(k, v)| expected.contains_key(&k) && *expected.get(&k).unwrap() == v);
+            && actual.map.clone().into_iter().all(|(k, v)| {
+                expected
+                    .get(&k)
+                    .unwrap()
+                    .iter()
+                    .all(|e| v.iter().any(|v_member| v_member == e))
+            });
         assert!(has_deep_equality);
     } else {
         assert!(false);

@@ -3,6 +3,9 @@ use constance::{
     types::OutputOptions,
 };
 use get_write_configurations_util::{
+    dotnet_object_like_enum_buffer::{
+        DOTNET_OBJECT_LIKE_ENUM_BUFFER1, DOTNET_OBJECT_LIKE_ENUM_BUFFER2,
+    },
     dotnet_simple_enum_buffer::DOTNET_SIMPLE_ENUM_BUFFER1,
     dotnet_simple_enum_buffer::DOTNET_SIMPLE_ENUM_BUFFER2,
     dotnet_simple_enum_with_description_buffer::DOTNET_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1,
@@ -13,6 +16,7 @@ use get_write_configurations_util::{
         DOTNET_STRING_ENUM_WITH_DESCRIPTION_BUFFER1, DOTNET_STRING_ENUM_WITH_DESCRIPTION_BUFFER2,
     },
     get_output_options_for_filename_test, get_table_constants_for_filename_test,
+    get_table_constants_for_object_like_buffer_test,
     get_table_constants_for_simple_enum_buffer_test,
     get_table_constants_for_simple_enum_with_description_buffer_test,
     get_table_constants_for_string_enum_buffer_test,
@@ -74,7 +78,11 @@ fn do_buffer_assertion(
     let first = configurations.first();
     let actual = &first.unwrap().buffer;
 
-    println!("{:?}\r\n{:?}", [actual], [expecteds.first().unwrap()]);
+    println!(
+        "{:?}\r\n\r\n\r\n{:?}",
+        [actual],
+        [expecteds.first().unwrap()]
+    );
     // assert
     assert!(expecteds.iter().any(|expected| expected == actual));
 }
@@ -226,6 +234,24 @@ pub fn typescript_string_enum_with_description_buffer() {
         &[
             TYPESCRIPT_STRING_ENUM_WITH_DESCRIPTION_BUFFER1,
             TYPESCRIPT_STRING_ENUM_WITH_DESCRIPTION_BUFFER2,
+        ],
+    )
+}
+
+fn do_object_like_buffer_test(lang: Language, expecteds: &[&str]) {
+    // arrange
+    let table_constants = get_table_constants_for_object_like_buffer_test();
+    let output_options = get_output_options_for_filename_test(lang);
+
+    do_buffer_assertion(&table_constants, &output_options, expecteds);
+}
+#[test]
+pub fn dotnet_object_like_enum_buffer() {
+    do_object_like_buffer_test(
+        Language::Dotnet,
+        &[
+            DOTNET_OBJECT_LIKE_ENUM_BUFFER1,
+            DOTNET_OBJECT_LIKE_ENUM_BUFFER2,
         ],
     )
 }

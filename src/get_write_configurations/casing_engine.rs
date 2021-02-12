@@ -1,5 +1,4 @@
 use inflector::cases::{camelcase, pascalcase, snakecase};
-#[allow(dead_code)]
 pub fn camel_case(name: &str) -> String {
     camelcase::to_camel_case(name)
 }

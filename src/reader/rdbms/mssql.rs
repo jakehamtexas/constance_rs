@@ -185,7 +185,7 @@ impl ReadDb for Mssql {
     async fn get_records_as_object_like(
         &self,
         table_option: &TableOption,
-    ) -> HashMap<ValueWithDescription, Vec<(String, String)>> {
+    ) -> HashMap<ValueWithDescription, Vec<(Column, String)>> {
         let columns_dto = get_columns(table_option);
 
         let client = self.get_client(table_option).await;
@@ -200,10 +200,10 @@ impl ReadDb for Mssql {
                     .iter()
                     .map(|column| {
                         get_column_of_unknown_type(row, column)
-                            .map(|column_value| (column.name.to_string(), column_value))
+                            .map(|column_value| (column.to_owned(), column_value))
                     })
                     .filter_map(|v| v)
-                    .collect::<Vec<(String, String)>>();
+                    .collect::<Vec<(Column, String)>>();
                 if let Some(key) = key_column {
                     let value_with_description = ValueWithDescription {
                         value: key,

@@ -127,7 +127,7 @@ fn get_filename(engine_type: &FileBufferEngineType, constant: &TableConstant) ->
     let identifier = match constant {
         TableConstant::SimpleEnum(e) => e.identifier.clone(),
         TableConstant::StringEnum(e) => e.identifier.clone(),
-        _ => panic!("Unimplemented!"),
+        TableConstant::ObjectLike(e) => e.identifier.clone(),
     };
 
     let name = [identifier.database_name, identifier.object_name].join("_");
