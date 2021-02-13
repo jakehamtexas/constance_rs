@@ -80,23 +80,11 @@ impl FileBufferEngine for Rust {
         primitive_enum(&constant.map, &constant.identifier, false)
     }
 
-    fn simple_enum_with_description(&self, constant: &SimpleEnum) -> String {
-        self.simple_enum(constant)
-    }
-
     fn string_enum(&self, constant: &StringEnum) -> String {
         primitive_enum(&constant.map, &constant.identifier, true)
     }
 
-    fn string_enum_with_description(&self, constant: &StringEnum) -> String {
-        self.string_enum(constant)
-    }
-
     fn object_like(&self, _constant: &ObjectLike) -> String {
-        todo!()
-    }
-
-    fn object_like_with_description(&self, _constant: &ObjectLike) -> String {
         todo!()
     }
 }

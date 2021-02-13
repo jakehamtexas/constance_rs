@@ -13,11 +13,8 @@ use self::tokens::QUOTATION_MARK;
 
 pub trait FileBufferEngine {
     fn simple_enum(&self, _constant: &SimpleEnum) -> String;
-    fn simple_enum_with_description(&self, _constant: &SimpleEnum) -> String;
     fn string_enum(&self, _constant: &StringEnum) -> String;
-    fn string_enum_with_description(&self, _constant: &StringEnum) -> String;
     fn object_like(&self, _constant: &ObjectLike) -> String;
-    fn object_like_with_description(&self, _constant: &ObjectLike) -> String;
 }
 
 pub enum FileBufferEngineType {

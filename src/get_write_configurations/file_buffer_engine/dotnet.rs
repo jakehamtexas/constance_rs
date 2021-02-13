@@ -204,10 +204,6 @@ impl FileBufferEngine for Dotnet {
         [before, members, after].join("")
     }
 
-    fn simple_enum_with_description(&self, constant: &SimpleEnum) -> String {
-        self.simple_enum(constant)
-    }
-
     fn string_enum(&self, constant: &StringEnum) -> String {
         let before = get_before_for_enum(&constant.identifier.object_name);
         let map_size = constant.map.len();
@@ -248,10 +244,6 @@ impl FileBufferEngine for Dotnet {
             .join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str());
         let after = get_after();
         [before, members, after].join("")
-    }
-
-    fn string_enum_with_description(&self, constant: &StringEnum) -> String {
-        self.string_enum(constant)
     }
 
     fn object_like(&self, constant: &ObjectLike) -> String {
@@ -328,9 +320,5 @@ impl FileBufferEngine for Dotnet {
 
         let after = get_after();
         [before, members, after].join("")
-    }
-
-    fn object_like_with_description(&self, constant: &ObjectLike) -> String {
-        self.object_like(constant)
     }
 }

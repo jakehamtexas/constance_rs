@@ -1,6 +1,4 @@
-use crate::{
-    constancerc::dto::language::Language, testing_only::ValueWithDescription, types::OutputOptions,
-};
+use crate::{constancerc::dto::language::Language, types::OutputOptions};
 
 use super::write_configuration::WriteConfiguration;
 use super::{
@@ -37,26 +35,10 @@ pub fn get_write_configurations(
                 .iter()
                 .map(|engine_type| {
                     let filename = get_filename(&engine_type, c);
-                    let buffer = if e
-                        .map
-                        .values()
-                        .any(|ValueWithDescription { description, .. }| description.is_some())
-                    {
-                        match &engine_type {
-                            FileBufferEngineType::Typesript(ts) => {
-                                ts.simple_enum_with_description(e)
-                            }
-                            FileBufferEngineType::Dotnet(dotnet) => {
-                                dotnet.simple_enum_with_description(e)
-                            }
-                            FileBufferEngineType::Rust(rs) => rs.simple_enum_with_description(e),
-                        }
-                    } else {
-                        match &engine_type {
-                            FileBufferEngineType::Typesript(ts) => ts.simple_enum(e),
-                            FileBufferEngineType::Dotnet(dotnet) => dotnet.simple_enum(e),
-                            FileBufferEngineType::Rust(rs) => rs.simple_enum(e),
-                        }
+                    let buffer = match &engine_type {
+                        FileBufferEngineType::Typesript(ts) => ts.simple_enum(e),
+                        FileBufferEngineType::Dotnet(dotnet) => dotnet.simple_enum(e),
+                        FileBufferEngineType::Rust(rs) => rs.simple_enum(e),
                     };
 
                     WriteConfiguration { filename, buffer }
@@ -66,26 +48,10 @@ pub fn get_write_configurations(
                 .iter()
                 .map(|engine_type| {
                     let filename = get_filename(&engine_type, c);
-                    let buffer = if e
-                        .map
-                        .values()
-                        .any(|ValueWithDescription { description, .. }| description.is_some())
-                    {
-                        match &engine_type {
-                            FileBufferEngineType::Typesript(ts) => {
-                                ts.string_enum_with_description(e)
-                            }
-                            FileBufferEngineType::Dotnet(dotnet) => {
-                                dotnet.string_enum_with_description(e)
-                            }
-                            FileBufferEngineType::Rust(rs) => rs.string_enum_with_description(e),
-                        }
-                    } else {
-                        match &engine_type {
-                            FileBufferEngineType::Typesript(ts) => ts.string_enum(e),
-                            FileBufferEngineType::Dotnet(dotnet) => dotnet.string_enum(e),
-                            FileBufferEngineType::Rust(rs) => rs.string_enum(e),
-                        }
+                    let buffer = match &engine_type {
+                        FileBufferEngineType::Typesript(ts) => ts.string_enum(e),
+                        FileBufferEngineType::Dotnet(dotnet) => dotnet.string_enum(e),
+                        FileBufferEngineType::Rust(rs) => rs.string_enum(e),
                     };
                     WriteConfiguration { filename, buffer }
                 })
@@ -94,26 +60,10 @@ pub fn get_write_configurations(
                 .iter()
                 .map(|engine_type| {
                     let filename = get_filename(&engine_type, c);
-                    let buffer = if e
-                        .map
-                        .keys()
-                        .any(|ValueWithDescription { description, .. }| description.is_some())
-                    {
-                        match &engine_type {
-                            FileBufferEngineType::Typesript(ts) => {
-                                ts.object_like_with_description(e)
-                            }
-                            FileBufferEngineType::Dotnet(dotnet) => {
-                                dotnet.object_like_with_description(e)
-                            }
-                            FileBufferEngineType::Rust(rs) => rs.object_like_with_description(e),
-                        }
-                    } else {
-                        match &engine_type {
-                            FileBufferEngineType::Typesript(ts) => ts.object_like(e),
-                            FileBufferEngineType::Dotnet(dotnet) => dotnet.object_like(e),
-                            FileBufferEngineType::Rust(rs) => rs.object_like(e),
-                        }
+                    let buffer = match &engine_type {
+                        FileBufferEngineType::Typesript(ts) => ts.object_like(e),
+                        FileBufferEngineType::Dotnet(dotnet) => dotnet.object_like(e),
+                        FileBufferEngineType::Rust(rs) => rs.object_like(e),
                     };
 
                     WriteConfiguration { filename, buffer }
