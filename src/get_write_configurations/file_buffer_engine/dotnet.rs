@@ -172,93 +172,90 @@ fn get_constructor_for_object_like(class_name: &str, columns: &Vec<&Column>) -> 
 impl FileBufferEngine for Dotnet {
     fn simple_enum(&self, constant: &SimpleEnum) -> String {
         let before = get_before_for_enum(&constant.identifier.object_name);
+        let map_size = constant.map.len();
         let members = constant
             .map
             .iter()
-            .map(|(key, ValueWithDescription { value, .. })| {
-                format!("{} = {}", casing_engine::pascal_case(key), value)
-            })
+            .enumerate()
+            .map(
+                |(index, (key, ValueWithDescription { value, description }))| {
+                    let is_last_iteration = index == map_size - 1;
+
+                    let without_comment = if is_last_iteration {
+                        format!("{} = {}", casing_engine::pascal_case(key), value)
+                    } else {
+                        format!("{} = {}{}", casing_engine::pascal_case(key), value, COMMA)
+                    };
+                    if let Some(description) = description {
+                        let comment_start = [API_COMMENT_SLASHES, SUMMARY_XML_OPEN].join(" ");
+                        let comment_description = [API_COMMENT_SLASHES, &description].join(" ");
+                        let comment_end = [API_COMMENT_SLASHES, SUMMARY_XML_CLOSE].join(" ");
+                        let mut comment = vec![comment_start, comment_description, comment_end];
+                        comment.push(without_comment);
+                        if !is_last_iteration {
+                            comment.last_mut().unwrap().push_str(NEWLINE);
+                        }
+
+                        comment.join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str())
+                    } else {
+                        without_comment
+                    }
+                },
+            )
             .collect::<Vec<String>>()
-            .join(
-                [COMMA, NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
-                    .join("")
-                    .as_str(),
-            );
+            .join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str());
         let after = get_after();
         [before, members, after].join("")
     }
 
     fn simple_enum_with_description(&self, constant: &SimpleEnum) -> String {
-        let before = get_before_for_enum(&constant.identifier.object_name);
-        let members = constant
-            .map
-            .clone()
-            .into_iter()
-            .map(|(key, ValueWithDescription { value, description })| {
-                let comment_start = [API_COMMENT_SLASHES, SUMMARY_XML_OPEN].join(" ");
-                let comment_description = [API_COMMENT_SLASHES, &description.unwrap()].join(" ");
-                let comment_end = [API_COMMENT_SLASHES, SUMMARY_XML_CLOSE].join(" ");
-
-                let member = format!("{} = {}", casing_engine::pascal_case(&key), value);
-                [comment_start, comment_description, comment_end, member]
-                    .join(&format!("{}{}{}", NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB))
-            })
-            .collect::<Vec<String>>()
-            .join(
-                [COMMA, NEWLINE, NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
-                    .join("")
-                    .as_str(),
-            );
-        let after = get_after();
-        [before, members, after].join("")
+        self.simple_enum(constant)
     }
 
     fn string_enum(&self, constant: &StringEnum) -> String {
         let before = get_before_for_enum(&constant.identifier.object_name);
+        let map_size = constant.map.len();
         let members = constant
             .map
             .iter()
-            .map(|(key, ValueWithDescription { value, .. })| {
-                [
-                    format!("[System.ComponentModel.Description(\"{}\")]", value),
-                    casing_engine::pascal_case(key),
-                ]
-                .join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str())
-            })
+            .enumerate()
+            .map(
+                |(index, (key, ValueWithDescription { value, description }))| {
+                    let is_last_iteration = index == map_size - 1;
+                    let without_comment = [
+                        format!("[System.ComponentModel.Description(\"{}\")]", value),
+                        if !is_last_iteration {
+                            [casing_engine::pascal_case(key), COMMA.to_string()].join("")
+                        } else {
+                            casing_engine::pascal_case(key)
+                        },
+                    ];
+
+                    if let Some(description) = description {
+                        let comment_start = [API_COMMENT_SLASHES, SUMMARY_XML_OPEN].join(" ");
+                        let comment_description = [API_COMMENT_SLASHES, &description].join(" ");
+                        let comment_end = [API_COMMENT_SLASHES, SUMMARY_XML_CLOSE].join(" ");
+                        let mut comment = vec![comment_start, comment_description, comment_end];
+                        comment.append(&mut without_comment.to_vec());
+                        if !is_last_iteration {
+                            comment.last_mut().unwrap().push_str(NEWLINE);
+                        }
+
+                        comment.join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str())
+                    } else {
+                        without_comment
+                            .join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str())
+                    }
+                },
+            )
             .collect::<Vec<String>>()
-            .join(
-                [COMMA, NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
-                    .join("")
-                    .as_str(),
-            );
+            .join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str());
         let after = get_after();
         [before, members, after].join("")
     }
 
     fn string_enum_with_description(&self, constant: &StringEnum) -> String {
-        let before = get_before_for_enum(&constant.identifier.object_name);
-        let members = constant
-            .map
-            .clone()
-            .into_iter()
-            .map(|(key, ValueWithDescription { value, description })| {
-                let comment_start = [API_COMMENT_SLASHES, SUMMARY_XML_OPEN].join(" ");
-                let comment_description = [API_COMMENT_SLASHES, &description.unwrap()].join(" ");
-                let comment_end = [API_COMMENT_SLASHES, SUMMARY_XML_CLOSE].join(" ");
-
-                let value = format!("[System.ComponentModel.Description(\"{}\")]", value);
-                let key = casing_engine::pascal_case(&key);
-                [comment_start, comment_description, comment_end, value, key]
-                    .join(&format!("{}{}{}", NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB))
-            })
-            .collect::<Vec<String>>()
-            .join(
-                [COMMA, NEWLINE, NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
-                    .join("")
-                    .as_str(),
-            );
-        let after = get_after();
-        [before, members, after].join("")
+        self.string_enum(constant)
     }
 
     fn object_like(&self, constant: &ObjectLike) -> String {
