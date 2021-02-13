@@ -32,17 +32,44 @@ fn primitive_enum(
     identifier: &TableIdentifier,
     quotes: bool,
 ) -> String {
+    let map_size = map.len();
     let members = map
         .iter()
-        .map(|(key, ValueWithDescription { value, .. })| {
-            format!(
-                "{} = {}",
-                casing_engine::pascal_case(key),
-                get_value(value, quotes)
-            )
-        })
+        .enumerate()
+        .map(
+            |(index, (key, ValueWithDescription { value, description }))| {
+                let is_last_iteration = index == map_size - 1;
+                let mut without_comment = if is_last_iteration {
+                    format!(
+                        "{} = {}",
+                        casing_engine::pascal_case(key),
+                        get_value(value, quotes)
+                    )
+                } else {
+                    format!(
+                        "{} = {}{}",
+                        casing_engine::pascal_case(key),
+                        get_value(value, quotes),
+                        COMMA
+                    )
+                };
+
+                if let Some(description) = description {
+                    let comment_description = ["", API_COMMENT_STAR, &description].join(" ");
+                    let comment_end = ["", COMMENT_END].join(" ");
+                    let comment = [COMMENT_START.to_owned(), comment_description, comment_end]
+                        .join(&format!("{}{}", NEWLINE, FOUR_SPACE_TAB));
+                    if !is_last_iteration {
+                        without_comment.push_str(NEWLINE);
+                    }
+                    [&comment, NEWLINE, FOUR_SPACE_TAB, &without_comment].join("")
+                } else {
+                    without_comment
+                }
+            },
+        )
         .collect::<Vec<String>>()
-        .join([COMMA, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
+        .join([NEWLINE, FOUR_SPACE_TAB].join("").as_str());
     [
         get_before(identifier),
         members,
@@ -52,44 +79,13 @@ fn primitive_enum(
     .join("")
 }
 
-fn primitive_enum_with_description(
-    map: &HashMap<String, ValueWithDescription>,
-    identifier: &TableIdentifier,
-    quotes: bool,
-) -> String {
-    let before = get_before(identifier);
-    let members = map
-        .clone()
-        .into_iter()
-        .map(|(key, ValueWithDescription { value, description })| {
-            let comment_description = ["", API_COMMENT_STAR, &description.unwrap()].join(" ");
-            let comment_end = ["", COMMENT_END].join(" ");
-            let member = format!(
-                "{} = {}",
-                casing_engine::pascal_case(&key),
-                get_value(&value, quotes)
-            );
-            [
-                COMMENT_START.to_owned(),
-                comment_description,
-                comment_end,
-                member,
-            ]
-            .join(&format!("{}{}", NEWLINE, FOUR_SPACE_TAB))
-        })
-        .collect::<Vec<String>>()
-        .join([COMMA, NEWLINE, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
-    let after = get_after(identifier);
-    [before, members, COMMA.to_owned(), after].join("")
-}
-
 impl FileBufferEngine for Typescript {
     fn simple_enum(&self, constant: &SimpleEnum) -> String {
         primitive_enum(&constant.map, &constant.identifier, false)
     }
 
     fn simple_enum_with_description(&self, constant: &SimpleEnum) -> String {
-        primitive_enum_with_description(&constant.map, &constant.identifier, false)
+        self.simple_enum(constant)
     }
 
     fn string_enum(&self, constant: &StringEnum) -> String {
@@ -97,7 +93,7 @@ impl FileBufferEngine for Typescript {
     }
 
     fn string_enum_with_description(&self, constant: &StringEnum) -> String {
-        primitive_enum_with_description(&constant.map, &constant.identifier, true)
+        self.string_enum(constant)
     }
 
     fn object_like(&self, _constant: &ObjectLike) -> String {
