@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use casing_engine::pascal_case;
 
 use crate::{
@@ -75,6 +77,96 @@ fn get_type_name(data_type: &str) -> String {
         ColumnType::Number => "int",
     }
     .to_string()
+}
+
+fn get_columns_for_object_like<'a>(
+    map: &'a HashMap<ValueWithDescription, Vec<(Column, String)>>,
+) -> Vec<&'a Column> {
+    map.values()
+        .nth(0)
+        .unwrap()
+        .into_iter()
+        .map(|(column, ..)| column)
+        .collect()
+}
+
+fn get_properties_for_object_like(columns: &Vec<&Column>) -> String {
+    columns
+        .iter()
+        .map(|Column { data_type, name }| {
+            format!(
+                "public readonly {} {};",
+                get_type_name(data_type),
+                pascal_case(name)
+            )
+        })
+        .collect::<Vec<String>>()
+        .join(
+            vec![NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
+                .join("")
+                .as_str(),
+        )
+}
+
+fn get_constructor_for_object_like(class_name: &str, columns: &Vec<&Column>) -> String {
+    let constructor_first_line = format!("private {}(", pascal_case(class_name));
+    let args = columns
+        .iter()
+        .map(|Column { data_type, name }| {
+            format!(
+                "{} {}",
+                get_type_name(&data_type),
+                casing_engine::camel_case(&name)
+            )
+        })
+        .collect::<Vec<String>>();
+    let constructor_assignments = columns
+        .iter()
+        .map(|Column { data_type: _, name }| {
+            vec![
+                format!(
+                    "{} = {};",
+                    casing_engine::pascal_case(name),
+                    casing_engine::camel_case(name)
+                ),
+                NEWLINE.to_string(),
+                FOUR_SPACE_TAB.to_string(),
+                FOUR_SPACE_TAB.to_string(),
+            ]
+            .join("")
+        })
+        .collect::<Vec<String>>();
+    vec![
+        vec![
+            FOUR_SPACE_TAB.to_string(),
+            FOUR_SPACE_TAB.to_string(),
+            constructor_first_line.to_owned(),
+            NEWLINE.to_string(),
+        ],
+        vec![vec![
+            args.iter()
+                .map(|arg| [FOUR_SPACE_TAB, FOUR_SPACE_TAB, FOUR_SPACE_TAB, arg].join(""))
+                .collect::<Vec<String>>()
+                .join(vec![COMMA, NEWLINE].join("").as_str()),
+            ")".to_string(),
+            OPEN_BRACE.to_string(),
+            constructor_assignments
+                .iter()
+                .map(|assignment| format!("{}{}", FOUR_SPACE_TAB, assignment))
+                .collect::<Vec<String>>()
+                .join(""),
+        ]
+        .join(
+            vec![NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
+                .join("")
+                .as_str(),
+        )],
+        vec![CLOSE_BRACE.to_string()],
+    ]
+    .into_iter()
+    .flatten()
+    .collect::<Vec<String>>()
+    .join("")
 }
 
 impl FileBufferEngine for Dotnet {
@@ -173,92 +265,11 @@ impl FileBufferEngine for Dotnet {
         let class_name = &constant.identifier.object_name;
         let before = get_before_for_sealed_class(class_name);
         let members = {
-            let map_clone = constant.map.clone();
-            let columns = map_clone
-                .values()
-                .nth(0)
-                .unwrap()
-                .into_iter()
-                .map(|(column, ..)| column)
-                .collect::<Vec<&Column>>();
-            let properties = columns
-                .iter()
-                .map(|Column { data_type, name }| {
-                    format!(
-                        "public readonly {} {};",
-                        get_type_name(data_type),
-                        pascal_case(name)
-                    )
-                })
-                .collect::<Vec<String>>()
-                .join(
-                    vec![NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
-                        .join("")
-                        .as_str(),
-                );
-            let constructor = {
-                let constructor_first_line = format!("private {}(", pascal_case(class_name));
-                let args = columns
-                    .iter()
-                    .map(|Column { data_type, name }| {
-                        format!(
-                            "{} {}",
-                            get_type_name(&data_type),
-                            casing_engine::camel_case(&name)
-                        )
-                    })
-                    .collect::<Vec<String>>();
-                let constructor_assignments = columns
-                    .iter()
-                    .map(|Column { data_type: _, name }| {
-                        vec![
-                            format!(
-                                "{} = {};",
-                                casing_engine::pascal_case(name),
-                                casing_engine::camel_case(name)
-                            ),
-                            NEWLINE.to_string(),
-                            FOUR_SPACE_TAB.to_string(),
-                            FOUR_SPACE_TAB.to_string(),
-                        ]
-                        .join("")
-                    })
-                    .collect::<Vec<String>>();
-                vec![
-                    vec![
-                        FOUR_SPACE_TAB.to_string(),
-                        FOUR_SPACE_TAB.to_string(),
-                        constructor_first_line.to_owned(),
-                        NEWLINE.to_string(),
-                    ],
-                    vec![vec![
-                        args.iter()
-                            .map(|arg| {
-                                [FOUR_SPACE_TAB, FOUR_SPACE_TAB, FOUR_SPACE_TAB, arg].join("")
-                            })
-                            .collect::<Vec<String>>()
-                            .join(vec![COMMA, NEWLINE].join("").as_str()),
-                        ")".to_string(),
-                        OPEN_BRACE.to_string(),
-                        constructor_assignments
-                            .iter()
-                            .map(|assignment| format!("{}{}", FOUR_SPACE_TAB, assignment))
-                            .collect::<Vec<String>>()
-                            .join(""),
-                    ]
-                    .join(
-                        vec![NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
-                            .join("")
-                            .as_str(),
-                    )],
-                    vec![CLOSE_BRACE.to_string()],
-                ]
-                .into_iter()
-                .flatten()
-                .collect::<Vec<String>>()
-                .join("")
-            };
+            let columns = get_columns_for_object_like(&constant.map);
+            let properties = get_properties_for_object_like(&columns);
+            let constructor = get_constructor_for_object_like(&class_name, &columns);
 
+            let map_size = constant.map.len();
             let static_instances = vec![
                 FOUR_SPACE_TAB.to_string(),
                 FOUR_SPACE_TAB.to_string(),
@@ -266,15 +277,10 @@ impl FileBufferEngine for Dotnet {
                     .map
                     .clone()
                     .into_iter()
+                    .enumerate()
                     .map(
-                        |(
-                            ValueWithDescription {
-                                value,
-                                description: _,
-                            },
-                            columns,
-                        )| {
-                            vec![
+                        |(index, (ValueWithDescription { value, description }, columns))| {
+                            let static_instance_parts = vec![
                                 format!(
                                     "public static {} {} = new {}(",
                                     pascal_case(class_name),
@@ -293,8 +299,31 @@ impl FileBufferEngine for Dotnet {
                                     .collect::<Vec<String>>()
                                     .join(", "),
                                 ");".to_string(),
-                            ]
-                            .join("")
+                            ];
+
+                            if let Some(description) = description {
+                                let comment_start =
+                                    [API_COMMENT_SLASHES, SUMMARY_XML_OPEN].join(" ");
+                                let comment_description =
+                                    [API_COMMENT_SLASHES, &description].join(" ");
+                                let comment_end =
+                                    [API_COMMENT_SLASHES, SUMMARY_XML_CLOSE].join(" ");
+                                let comment = vec![comment_start, comment_description, comment_end]
+                                    .join(
+                                        vec![NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
+                                            .join("")
+                                            .as_str(),
+                                    );
+                                let mut comment = vec![comment];
+                                comment.push([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join(""));
+                                comment.extend(static_instance_parts);
+                                if index != map_size - 1 {
+                                    comment.push(NEWLINE.to_string());
+                                }
+                                comment.join("")
+                            } else {
+                                static_instance_parts.join("")
+                            }
                         },
                     )
                     .collect::<Vec<String>>()
@@ -310,145 +339,6 @@ impl FileBufferEngine for Dotnet {
     }
 
     fn object_like_with_description(&self, constant: &ObjectLike) -> String {
-        let class_name = &constant.identifier.object_name;
-        let before = get_before_for_sealed_class(class_name);
-        let members = {
-            let map_clone = constant.map.clone();
-            let columns = map_clone
-                .values()
-                .nth(0)
-                .unwrap()
-                .into_iter()
-                .map(|(column, ..)| column)
-                .collect::<Vec<&Column>>();
-            let properties = columns
-                .iter()
-                .map(|Column { data_type, name }| {
-                    format!(
-                        "public readonly {} {};",
-                        get_type_name(data_type),
-                        pascal_case(name)
-                    )
-                })
-                .collect::<Vec<String>>()
-                .join(
-                    vec![NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
-                        .join("")
-                        .as_str(),
-                );
-            let constructor = {
-                let constructor_first_line = format!("private {}(", pascal_case(class_name));
-                let args = columns
-                    .iter()
-                    .map(|Column { data_type, name }| {
-                        format!(
-                            "{} {}",
-                            get_type_name(&data_type),
-                            casing_engine::camel_case(&name)
-                        )
-                    })
-                    .collect::<Vec<String>>();
-                let constructor_assignments = columns
-                    .iter()
-                    .map(|Column { data_type: _, name }| {
-                        vec![
-                            format!(
-                                "{} = {};",
-                                casing_engine::pascal_case(name),
-                                casing_engine::camel_case(name)
-                            ),
-                            NEWLINE.to_string(),
-                            FOUR_SPACE_TAB.to_string(),
-                            FOUR_SPACE_TAB.to_string(),
-                        ]
-                        .join("")
-                    })
-                    .collect::<Vec<String>>();
-                vec![
-                    vec![
-                        FOUR_SPACE_TAB.to_string(),
-                        FOUR_SPACE_TAB.to_string(),
-                        constructor_first_line.to_owned(),
-                        NEWLINE.to_string(),
-                    ],
-                    vec![vec![
-                        args.iter()
-                            .map(|arg| {
-                                [FOUR_SPACE_TAB, FOUR_SPACE_TAB, FOUR_SPACE_TAB, arg].join("")
-                            })
-                            .collect::<Vec<String>>()
-                            .join(vec![COMMA, NEWLINE].join("").as_str()),
-                        ")".to_string(),
-                        OPEN_BRACE.to_string(),
-                        constructor_assignments
-                            .iter()
-                            .map(|assignment| format!("{}{}", FOUR_SPACE_TAB, assignment))
-                            .collect::<Vec<String>>()
-                            .join(""),
-                    ]
-                    .join(
-                        vec![NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
-                            .join("")
-                            .as_str(),
-                    )],
-                    vec![CLOSE_BRACE.to_string()],
-                ]
-                .into_iter()
-                .flatten()
-                .collect::<Vec<String>>()
-                .join("")
-            };
-
-            let static_instances = vec![
-                FOUR_SPACE_TAB.to_string(),
-                FOUR_SPACE_TAB.to_string(),
-                constant
-                    .map
-                    .clone()
-                    .into_iter()
-                    .map(|(ValueWithDescription { value, description }, columns)| {
-                        let comment_start = [API_COMMENT_SLASHES, SUMMARY_XML_OPEN].join(" ");
-                        let comment_description =
-                            [API_COMMENT_SLASHES, &description.unwrap()].join(" ");
-                        let comment_end = [API_COMMENT_SLASHES, SUMMARY_XML_CLOSE].join(" ");
-
-                        vec![
-                            vec![comment_start, comment_description, comment_end].join(
-                                vec![NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
-                                    .join("")
-                                    .as_str(),
-                            ),
-                            format!(
-                                "{}public static {} {} = new {}(",
-                                vec![NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join(""),
-                                pascal_case(class_name),
-                                pascal_case(&value),
-                                pascal_case(class_name)
-                            ),
-                            columns
-                                .iter()
-                                .map(|(Column { data_type, name: _ }, value)| {
-                                    if data_type == STRING_TYPE {
-                                        format!("\"{}\"", value)
-                                    } else {
-                                        value.to_string()
-                                    }
-                                })
-                                .collect::<Vec<String>>()
-                                .join(", "),
-                            ");".to_string(),
-                        ]
-                        .join("")
-                    })
-                    .collect::<Vec<String>>()
-                    .join(&vec![NEWLINE, NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("")),
-            ]
-            .join("");
-            [properties, constructor, static_instances]
-                .join(vec![NEWLINE, NEWLINE].join("").as_str())
-        };
-
-        let after = get_after();
-        [before, members, after].join("")
+        self.object_like(constant)
     }
 }
