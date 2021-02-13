@@ -101,11 +101,7 @@ fn get_properties_for_object_like(columns: &Vec<&Column>) -> String {
             )
         })
         .collect::<Vec<String>>()
-        .join(
-            vec![NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB]
-                .join("")
-                .as_str(),
-        )
+        .join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str())
 }
 
 fn get_constructor_for_object_like(class_name: &str, columns: &Vec<&Column>) -> String {
@@ -123,7 +119,7 @@ fn get_constructor_for_object_like(class_name: &str, columns: &Vec<&Column>) -> 
     let constructor_assignments = columns
         .iter()
         .map(|Column { data_type: _, name }| {
-            vec![
+            [
                 format!(
                     "{} = {};",
                     casing_engine::pascal_case(name),
@@ -324,11 +320,10 @@ impl FileBufferEngine for Dotnet {
                         },
                     )
                     .collect::<Vec<String>>()
-                    .join(&vec![NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("")),
+                    .join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str()),
             ]
             .join("");
-            [properties, constructor, static_instances]
-                .join(vec![NEWLINE, NEWLINE].join("").as_str())
+            [properties, constructor, static_instances].join([NEWLINE, NEWLINE].join("").as_str())
         };
 
         let after = get_after();

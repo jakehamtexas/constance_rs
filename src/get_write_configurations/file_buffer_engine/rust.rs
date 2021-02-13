@@ -68,7 +68,7 @@ fn primitive_enum_with_description(
                 casing_engine::pascal_case(&key),
                 get_value(&value, quotes)
             );
-            [comment, member].join(&format!("{}{}", NEWLINE, FOUR_SPACE_TAB))
+            [comment, member].join([NEWLINE, FOUR_SPACE_TAB].join("").as_str())
         })
         .collect::<Vec<String>>()
         .join([COMMA, NEWLINE, NEWLINE, FOUR_SPACE_TAB].join("").as_str());
