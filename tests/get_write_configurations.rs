@@ -37,6 +37,10 @@ use get_write_configurations_util::{
     typescript_object_like_enum_buffer::{
         TYPESCRIPT_OBJECT_LIKE_ENUM_BUFFER1, TYPESCRIPT_OBJECT_LIKE_ENUM_BUFFER2,
     },
+    typescript_object_like_enum_with_description_buffer::{
+        TYPESCRIPT_OBJECT_LIKE_ENUM_WITH_DESCRIPTION_BUFFER1,
+        TYPESCRIPT_OBJECT_LIKE_ENUM_WITH_DESCRIPTION_BUFFER2,
+    },
     typescript_simple_enum_buffer::TYPESCRIPT_SIMPLE_ENUM_BUFFER1,
     typescript_simple_enum_buffer::TYPESCRIPT_SIMPLE_ENUM_BUFFER2,
     typescript_simple_enum_with_description_buffer::TYPESCRIPT_SIMPLE_ENUM_WITH_DESCRIPTION_BUFFER1,
@@ -291,6 +295,17 @@ pub fn dotnet_object_like_enum_with_description_buffer() {
         &[
             DOTNET_OBJECT_LIKE_ENUM_WITH_DESCRIPTION_BUFFER1,
             DOTNET_OBJECT_LIKE_ENUM_WITH_DESCRIPTION_BUFFER2,
+        ],
+    )
+}
+
+#[test]
+pub fn typescript_object_like_enum_with_description_buffer() {
+    do_object_like_with_description_buffer_test(
+        Language::Typescript,
+        &[
+            TYPESCRIPT_OBJECT_LIKE_ENUM_WITH_DESCRIPTION_BUFFER1,
+            TYPESCRIPT_OBJECT_LIKE_ENUM_WITH_DESCRIPTION_BUFFER2,
         ],
     )
 }

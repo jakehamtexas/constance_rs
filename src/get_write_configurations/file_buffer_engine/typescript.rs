@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use casing_engine::pascal_case;
-use serde::de::value;
 
 use crate::{
     get_write_configurations::casing_engine,
@@ -99,23 +98,16 @@ impl FileBufferEngine for Typescript {
             NEWLINE,
         ]
         .join("");
+        let map_size = constant.map.len();
         let next_lines = constant
             .map
             .clone()
             .into_iter()
             .enumerate()
             .map(
-                |(
-                    index,
-                    (
-                        ValueWithDescription {
-                            description: _,
-                            value,
-                        },
-                        column_value_pairs,
-                    ),
-                )| {
-                    [
+                |(index, (ValueWithDescription { description, value }, column_value_pairs))| {
+                    let is_last_iteration = index == map_size - 1;
+                    let mut without_comment = [
                         vec![
                             FOUR_SPACE_TAB,
                             format!("{}: ", pascal_case(&value)).as_str(),
@@ -144,7 +136,19 @@ impl FileBufferEngine for Typescript {
                         .join(""),
                         vec![CLOSE_BRACE, COMMA, NEWLINE].join(""),
                     ]
-                    .join([NEWLINE, FOUR_SPACE_TAB].join("").as_str())
+                    .join([NEWLINE, FOUR_SPACE_TAB].join("").as_str());
+                    if let Some(description) = description {
+                        let comment_description = ["", API_COMMENT_STAR, &description].join(" ");
+                        let comment_end = ["", COMMENT_END].join(" ");
+                        let comment = [COMMENT_START.to_owned(), comment_description, comment_end]
+                            .join(&format!("{}{}", NEWLINE, FOUR_SPACE_TAB));
+                        if !is_last_iteration {
+                            without_comment.push_str(NEWLINE);
+                        }
+                        [FOUR_SPACE_TAB, &comment, NEWLINE, &without_comment].join("")
+                    } else {
+                        without_comment
+                    }
                 },
             )
             .collect::<Vec<_>>()
