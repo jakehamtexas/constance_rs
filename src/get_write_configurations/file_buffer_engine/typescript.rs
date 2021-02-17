@@ -1,11 +1,15 @@
 use std::collections::HashMap;
 
+use casing_engine::pascal_case;
+use serde::de::value;
+
 use crate::{
     get_write_configurations::casing_engine,
     table_to_constants::table_constant::object_like::ObjectLike,
     table_to_constants::table_constant::simple_enum::SimpleEnum,
-    table_to_constants::table_constant::string_enum::StringEnum, testing_only::TableIdentifier,
-    testing_only::ValueWithDescription,
+    table_to_constants::table_constant::string_enum::StringEnum,
+    testing_only::TableIdentifier,
+    testing_only::{Column, ValueWithDescription, STRING_TYPE},
 };
 
 static API_COMMENT_STAR: &str = "*";
@@ -88,7 +92,67 @@ impl FileBufferEngine for Typescript {
         primitive_enum(&constant.map, &constant.identifier, true)
     }
 
-    fn object_like(&self, _constant: &ObjectLike) -> String {
-        todo!()
+    fn object_like(&self, constant: &ObjectLike) -> String {
+        let const_object_name = get_name(&constant.identifier);
+        let first_line = [
+            format!("const {} = {{", const_object_name).as_str(),
+            NEWLINE,
+        ]
+        .join("");
+        let next_lines = constant
+            .map
+            .clone()
+            .into_iter()
+            .enumerate()
+            .map(
+                |(
+                    index,
+                    (
+                        ValueWithDescription {
+                            description: _,
+                            value,
+                        },
+                        column_value_pairs,
+                    ),
+                )| {
+                    [
+                        vec![
+                            FOUR_SPACE_TAB,
+                            format!("{}: ", pascal_case(&value)).as_str(),
+                            OPEN_BRACE,
+                        ]
+                        .join(""),
+                        vec![
+                            FOUR_SPACE_TAB,
+                            column_value_pairs
+                                .iter()
+                                .map(|(Column { name, data_type }, value)| {
+                                    format!(
+                                        "{}: {},",
+                                        name,
+                                        if data_type == STRING_TYPE {
+                                            format!("\"{}\"", value)
+                                        } else {
+                                            value.to_string()
+                                        },
+                                    )
+                                })
+                                .collect::<Vec<_>>()
+                                .join([NEWLINE, FOUR_SPACE_TAB, FOUR_SPACE_TAB].join("").as_str())
+                                .as_str(),
+                        ]
+                        .join(""),
+                        vec![CLOSE_BRACE, COMMA, NEWLINE].join(""),
+                    ]
+                    .join([NEWLINE, FOUR_SPACE_TAB].join("").as_str())
+                },
+            )
+            .collect::<Vec<_>>()
+            .join("");
+        let last_lines = format!(
+            "{} as const;{}{}export default {};{}",
+            CLOSE_BRACE, NEWLINE, NEWLINE, const_object_name, NEWLINE
+        );
+        [first_line, next_lines, last_lines].join("")
     }
 }
